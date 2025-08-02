@@ -1,0 +1,32 @@
+<!-- Switch -->
+<button
+  type="button"
+  role="switch"
+  aria-checked="false"
+  id="toggle-switch"
+  class="relative inline-flex h-[1.15rem] w-8 shrink-0 items-center rounded-full border border-transparent transition-all outline-none focus-visible:ring-2 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50
+         bg-zinc-300 dark:bg-zinc-600"
+>
+  <span
+    class="pointer-events-none block size-4 rounded-full bg-white shadow transition-transform translate-x-0"
+  ></span>
+</button>
+
+<script>
+  const switchBtn = document.getElementById("toggle-switch");
+
+  switchBtn.addEventListener("click", () => {
+    const checked = switchBtn.getAttribute("aria-checked") === "true";
+    switchBtn.setAttribute("aria-checked", String(!checked));
+
+    switchBtn.classList.toggle("bg-zinc-300", checked); // unchecked
+    switchBtn.classList.toggle("bg-primary", !checked); // checked
+
+    const thumb = switchBtn.querySelector("span");
+    if (thumb) {
+      thumb.style.transform = checked
+        ? "translateX(0)"
+        : "translateX(calc(100% - 0.5rem))";
+    }
+  });
+</script>
