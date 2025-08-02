@@ -1,0 +1,61 @@
+<!-- Command Palette Dialog -->
+<div id="command-dialog" class="fixed inset-0 z-50 hidden items-start justify-center bg-black/50 p-4 sm:items-center sm:p-0">
+    <div class="bg-white dark:bg-zinc-900 rounded-md shadow-xl w-full max-w-md overflow-hidden">
+      <div class="border-b px-3 py-2 flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-4 shrink-0 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M16 10a6 6 0 11-12 0 6 6 0 0112 0z" />
+        </svg>
+        <input id="command-input" type="text" placeholder="Search..." class="h-10 w-full text-sm bg-transparent outline-none" />
+      </div>
+      <div id="command-list" class="max-h-64 overflow-y-auto text-sm">
+        <div class="px-2 py-1.5 text-xs text-muted-foreground font-medium">Suggestions</div>
+        <button class="w-full text-left px-2 py-2 hover:bg-accent focus:bg-accent focus:outline-none data-[disabled=true]:opacity-50">New File <span class="ml-auto text-xs tracking-widest text-muted-foreground">⌘N</span></button>
+        <button class="w-full text-left px-2 py-2 hover:bg-accent focus:bg-accent focus:outline-none">Open File <span class="ml-auto text-xs tracking-widest text-muted-foreground">⌘O</span></button>
+        <button class="w-full text-left px-2 py-2 hover:bg-accent focus:bg-accent focus:outline-none">Save All <span class="ml-auto text-xs tracking-widest text-muted-foreground">⌘S</span></button>
+        <div id="command-empty" class="hidden py-6 text-center text-sm text-muted-foreground">No results found.</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Trigger Button -->
+  <button onclick="toggleCommandPalette()" class="fixed bottom-4 right-4 px-4 py-2 bg-black text-white rounded-md shadow">Open Command Palette</button>
+  
+  <!-- Script -->
+  <script>
+    const dialog = document.getElementById('command-dialog');
+    const input = document.getElementById('command-input');
+    const list = document.getElementById('command-list');
+    const empty = document.getElementById('command-empty');
+  
+    function toggleCommandPalette() {
+      dialog.classList.toggle('hidden');
+      input.value = '';
+      filterList('');
+      if (!dialog.classList.contains('hidden')) {
+        setTimeout(() => input.focus(), 10);
+      }
+    }
+  
+    function filterList(query) {
+      const items = list.querySelectorAll('button');
+      let visibleCount = 0;
+      items.forEach(item => {
+        const match = item.textContent.toLowerCase().includes(query.toLowerCase());
+        item.style.display = match ? '' : 'none';
+        if (match) visibleCount++;
+      });
+      empty.classList.toggle('hidden', visibleCount > 0);
+    }
+  
+    input.addEventListener('input', (e) => filterList(e.target.value));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        toggleCommandPalette();
+      }
+      if (e.key === 'Escape') {
+        dialog.classList.add('hidden');
+      }
+    });
+  </script>
+  
