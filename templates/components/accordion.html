@@ -1,0 +1,51 @@
+<style>
+    .accordion-content[data-state='open'] {
+      animation: accordion-down 0.3s ease-out;
+    }
+    .accordion-content[data-state='closed'] {
+      animation: accordion-up 0.3s ease-in;
+    }
+    @keyframes accordion-down {
+      from { height: 0; opacity: 0; }
+      to { height: auto; opacity: 1; }
+    }
+    @keyframes accordion-up {
+      from { height: auto; opacity: 1; }
+      to { height: 0; opacity: 0; }
+    }
+  </style>
+  
+  <div class="accordion border-b divide-y divide-border">
+    <div class="accordion-item">
+      <button class="accordion-trigger flex w-full items-start justify-between gap-4 py-4 text-left text-sm font-medium transition-all hover:underline focus:outline-none">
+        <span>Accordion Title</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="chevron-icon size-4 shrink-0 translate-y-0.5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      <div class="accordion-content overflow-hidden text-sm hidden pt-0 pb-4">
+        <p>This is the content of the accordion. You can include anything here like paragraphs, lists, or other HTML.</p>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.accordion-trigger').forEach(button => {
+        button.addEventListener('click', () => {
+          const content = button.parentElement.querySelector('.accordion-content');
+          const svg = button.querySelector('svg');
+          if (content.classList.contains('hidden')) {
+            content.classList.remove('hidden');
+            content.dataset.state = 'open';
+            svg.classList.add('rotate-180');
+          } else {
+            content.classList.add('hidden');
+            content.dataset.state = 'closed';
+            svg.classList.remove('rotate-180');
+          }
+        });
+      });
+    });
+  </script>
+  
