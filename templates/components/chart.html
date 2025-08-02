@@ -1,0 +1,65 @@
+<div id="chart-container" class="flex aspect-video justify-center text-xs">
+    <canvas id="chartCanvas" class="max-w-full max-h-full"></canvas>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const ctx = document.getElementById('chartCanvas').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Red', 'Blue', 'Yellow'],
+        datasets: [{
+          label: 'Votes',
+          data: [12, 19, 3],
+          backgroundColor: ['#ef4444', '#3b82f6', '#facc15'],
+          borderRadius: 4,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            labels: {
+              color: '#6b7280', // Tailwind gray-500
+              font: {
+                size: 12,
+              }
+            }
+          },
+          tooltip: {
+            backgroundColor: '#1f2937', // Tailwind gray-800
+            titleColor: '#fff',
+            bodyColor: '#d1d5db', // Tailwind gray-300
+            borderColor: '#4b5563',
+            borderWidth: 1,
+          }
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: '#6b7280',
+              font: {
+                size: 12
+              }
+            },
+            grid: {
+              color: '#e5e7eb' // Tailwind gray-200
+            }
+          },
+          y: {
+            ticks: {
+              color: '#6b7280',
+              font: {
+                size: 12
+              }
+            },
+            grid: {
+              color: '#e5e7eb'
+            }
+          }
+        }
+      }
+    });
+  </script>
+  
