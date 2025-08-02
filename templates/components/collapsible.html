@@ -1,0 +1,45 @@
+<div class="w-full max-w-md mx-auto">
+    <button
+      type="button"
+      class="collapsible-trigger w-full rounded bg-blue-600 px-4 py-2 text-left text-white transition hover:bg-blue-700"
+      onclick="toggleCollapsible(this)"
+      aria-expanded="false"
+    >
+      Toggle Collapsible
+    </button>
+  
+    <div
+      class="collapsible-content mt-2 overflow-hidden transition-[max-height] duration-300 ease-in-out max-h-0"
+      style="max-height: 0"
+    >
+      <div class="rounded border border-gray-300 p-4 text-sm text-gray-700 dark:text-gray-300 dark:border-gray-600">
+        This is the collapsible content. It smoothly opens and closes.
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    function toggleCollapsible(button) {
+      const content = button.nextElementSibling;
+      const isOpen = button.getAttribute("aria-expanded") === "true";
+  
+      button.setAttribute("aria-expanded", String(!isOpen));
+  
+      if (isOpen) {
+        content.style.maxHeight = "0";
+      } else {
+        content.style.maxHeight = content.scrollHeight + "px";
+      }
+    }
+  
+    // Optional: Reset maxHeight on window resize
+    window.addEventListener("resize", () => {
+      document.querySelectorAll(".collapsible-trigger").forEach((button) => {
+        if (button.getAttribute("aria-expanded") === "true") {
+          const content = button.nextElementSibling;
+          content.style.maxHeight = content.scrollHeight + "px";
+        }
+      });
+    });
+  </script>
+  
