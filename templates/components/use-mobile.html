@@ -1,0 +1,28 @@
+<script>
+    const MOBILE_BREAKPOINT = 768;
+  
+    function isMobile() {
+      return window.innerWidth < MOBILE_BREAKPOINT;
+    }
+  
+    function onMobileChange(callback) {
+      const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`);
+      const handler = (event) => callback(event.matches);
+  
+      // Initial call
+      callback(mql.matches);
+  
+      // Listen for changes
+      mql.addEventListener("change", handler);
+  
+      // Return cleanup
+      return () => mql.removeEventListener("change", handler);
+    }
+  
+    // Example usage:
+    onMobileChange((matches) => {
+      console.log("Is mobile:", matches);
+      document.body.dataset.mobile = matches ? "true" : "false";
+    });
+  </script>
+  
