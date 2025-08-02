@@ -1,0 +1,57 @@
+<div class="relative inline-block">
+    <!-- Trigger -->
+    <button
+      id="popoverTrigger"
+      class="inline-flex items-center justify-center rounded-md border bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-gray-100"
+      aria-haspopup="dialog"
+      aria-expanded="false"
+    >
+      Open Popover
+    </button>
+  
+    <!-- Popover Content -->
+    <div
+      id="popoverContent"
+      role="dialog"
+      aria-modal="false"
+      class="absolute z-50 mt-2 w-72 rounded-md border bg-white p-4 text-sm text-gray-800 shadow-md opacity-0 scale-95 pointer-events-none transition-opacity duration-200 ease-out"
+    >
+      <p class="mb-2">This is popover content.</p>
+      <button
+        id="closePopover"
+        class="mt-2 rounded-md bg-gray-100 px-3 py-1 text-xs hover:bg-gray-200"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+  
+  <script>
+    const trigger = document.getElementById("popoverTrigger");
+    const content = document.getElementById("popoverContent");
+    const closeBtn = document.getElementById("closePopover");
+  
+    function togglePopover(show) {
+      const visible = show ?? content.classList.contains("opacity-0");
+      content.classList.toggle("opacity-0", !visible);
+      content.classList.toggle("pointer-events-none", !visible);
+      content.classList.toggle("scale-95", !visible);
+      content.classList.toggle("scale-100", visible);
+      content.classList.toggle("opacity-100", visible);
+      trigger.setAttribute("aria-expanded", visible.toString());
+    }
+  
+    trigger.addEventListener("click", () => togglePopover());
+    closeBtn.addEventListener("click", () => togglePopover(false));
+  
+    // Optional: click outside to close
+    document.addEventListener("click", (e) => {
+      if (
+        !trigger.contains(e.target) &&
+        !content.contains(e.target)
+      ) {
+        togglePopover(false);
+      }
+    });
+  </script>
+  
