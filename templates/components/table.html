@@ -1,0 +1,52 @@
+<div class="relative w-full overflow-x-auto" data-slot="table-container">
+    <table class="w-full caption-bottom text-sm" data-slot="table">
+      <caption class="text-muted-foreground mt-4 text-sm" data-slot="table-caption">
+        A list of your recent invoices.
+      </caption>
+      <thead class="[&_tr]:border-b" data-slot="table-header">
+        <tr data-slot="table-row" class="hover:bg-muted/50 border-b transition-colors">
+          <th class="text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap" data-slot="table-head">
+            Invoice
+          </th>
+          <th class="text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap" data-slot="table-head">
+            Status
+          </th>
+          <th class="text-foreground h-10 px-2 text-left align-middle font-medium whitespace-nowrap" data-slot="table-head">
+            Amount
+          </th>
+        </tr>
+      </thead>
+      <tbody class="[&_tr:last-child]:border-0" data-slot="table-body">
+        <tr data-slot="table-row" class="hover:bg-muted/50 border-b transition-colors">
+          <td class="p-2 align-middle whitespace-nowrap" data-slot="table-cell">
+            #1001
+          </td>
+          <td class="p-2 align-middle whitespace-nowrap" data-slot="table-cell">
+            Paid
+          </td>
+          <td class="p-2 align-middle whitespace-nowrap" data-slot="table-cell">
+            $250.00
+          </td>
+        </tr>
+        <tr data-slot="table-row" class="hover:bg-muted/50 border-b transition-colors" data-state="selected">
+          <td class="p-2 align-middle whitespace-nowrap" data-slot="table-cell">
+            #1002
+          </td>
+          <td class="p-2 align-middle whitespace-nowrap" data-slot="table-cell">
+            Pending
+          </td>
+          <td class="p-2 align-middle whitespace-nowrap" data-slot="table-cell">
+            $120.00
+          </td>
+        </tr>
+      </tbody>
+      <tfoot class="bg-muted/50 border-t font-medium [&>tr]:last:border-b-0" data-slot="table-footer">
+        <tr data-slot="table-row">
+          <td class="p-2 align-middle whitespace-nowrap" data-slot="table-cell" colspan="3">
+            2 invoices total
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  
