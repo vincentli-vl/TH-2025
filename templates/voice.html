@@ -37,22 +37,6 @@
             </p>
         </div>
 
-        <!-- Quick Test -->
-        <div class="text-center mb-6">
-            <button 
-                onclick="testResponse()"
-                class="px-3 py-1 bg-gray-200 text-gray-700 rounded text-sm hover:bg-gray-300"
-            >
-                Test Response
-            </button>
-            <button 
-                onclick="testConnection()"
-                class="px-3 py-1 bg-blue-200 text-blue-700 rounded text-sm hover:bg-blue-300 ml-2"
-            >
-                Test Connection
-            </button>
-        </div>
-
         <!-- Text Input Fallback (hidden by default) -->
         <div id="text-input-fallback" class="mb-4 hidden">
             <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -133,40 +117,6 @@
 </div>
 
 <script>
-    // Test basic connection
-    async function testConnection() {
-        try {
-            console.log('Testing connection...');
-            const response = await fetch('/test');
-            const data = await response.json();
-            console.log('Connection test result:', data);
-            alert('Connection working: ' + data.message);
-        } catch (error) {
-            console.error('Connection test failed:', error);
-            alert('Connection failed: ' + error.message);
-        }
-    }
-
-    // Quick test function
-    async function testResponse() {
-        try {
-            console.log('Testing response...');
-            const response = await fetch('/transcribe', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: 'test' })
-            });
-            const data = await response.json();
-            console.log('Response test result:', data);
-            if (data.success) {
-                document.getElementById('response-display').textContent = data.response;
-            }
-        } catch (error) {
-            console.error('Test failed:', error);
-            alert('Test failed: ' + error.message);
-        }
-    }
-
     // Additional functionality for conversation history
     async function loadConversationHistory() {
         try {

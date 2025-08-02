@@ -73,16 +73,12 @@
                         // Update the transcript
                         if (finalTranscript) {
                             this.transcript = finalTranscript;
-                            console.log('Final transcript:', this.transcript);
                         }
                         
                         // Show both final and interim results
                         const displayText = this.transcript + interimTranscript;
                         this.updateTranscriptionDisplay(displayText);
                         
-                        if (interimTranscript) {
-                            console.log('Interim transcript:', interimTranscript);
-                        }
                     };
 
                     this.recognition.onerror = (event) => {
@@ -225,11 +221,9 @@
                 }
                 
                 // Send the final transcript to server
-                console.log('Final transcript to send:', this.transcript);
                 if (this.transcript.trim()) {
                     this.sendTranscriptionToServer(this.transcript);
                 } else {
-                    console.log('No transcript to send');
                     this.updateStatus('No speech detected');
                 }
             }

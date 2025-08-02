@@ -82,13 +82,6 @@ def loop():
 		scan("output1.png", cam1)
 		
 
- 
-
-@app.route('/test')
-def test():
-    print("Test route accessed!")
-    return jsonify({'message': 'Flask app is running!'})
-
 @app.route('/voice')
 def voice():
     return render_template('voice.html')
