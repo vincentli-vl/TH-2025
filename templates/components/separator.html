@@ -1,0 +1,39 @@
+<!-- Separator Element -->
+<div
+  id="separator"
+  data-orientation="horizontal"
+  class="bg-gray-200 dark:bg-gray-700 shrink-0 w-full h-px my-4"
+  aria-hidden="true"
+></div>
+
+<!-- Orientation Toggle Buttons (for demonstration) -->
+<div class="flex items-center gap-4 mt-4">
+  <button
+    onclick="setSeparatorOrientation('horizontal')"
+    class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+  >
+    Horizontal
+  </button>
+  <button
+    onclick="setSeparatorOrientation('vertical')"
+    class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+  >
+    Vertical
+  </button>
+</div>
+
+<!-- JavaScript for Orientation Switching -->
+<script>
+  function setSeparatorOrientation(orientation) {
+    const separator = document.getElementById("separator");
+    separator.dataset.orientation = orientation;
+
+    if (orientation === "vertical") {
+      separator.className =
+        "bg-gray-200 dark:bg-gray-700 shrink-0 h-full w-px mx-4";
+    } else {
+      separator.className =
+        "bg-gray-200 dark:bg-gray-700 shrink-0 w-full h-px my-4";
+    }
+  }
+</script>
