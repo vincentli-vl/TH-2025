@@ -1,0 +1,80 @@
+<div class="relative group/navigation-menu max-w-max flex items-center justify-center">
+    <!-- Navigation Menu List -->
+    <ul class="flex list-none items-center justify-center gap-1">
+      <!-- Menu Item -->
+      <li class="relative group/item">
+        <!-- Trigger -->
+        <button type="button"
+          class="group inline-flex h-9 items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium hover:bg-gray-100 focus:outline-none focus-visible:ring-2 ring-black transition-colors"
+          data-menu-trigger>
+          Products
+          <svg class="ml-1 h-3 w-3 transition-transform duration-300 group-[.open]/item:rotate-180" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.06l3.71-3.83a.75.75 0 111.08 1.04l-4.25 4.38a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+  
+        <!-- Content -->
+        <div
+          class="absolute z-50 mt-1.5 hidden w-64 rounded-md border bg-white p-4 shadow group-[.open]/item:block"
+          data-menu-content>
+          <div class="flex flex-col gap-2 text-sm">
+            <a href="#" class="hover:bg-gray-100 rounded px-2 py-1 focus:outline-none focus-visible:ring-2">Overview</a>
+            <a href="#" class="hover:bg-gray-100 rounded px-2 py-1 focus:outline-none focus-visible:ring-2">Pricing</a>
+            <a href="#" class="hover:bg-gray-100 rounded px-2 py-1 focus:outline-none focus-visible:ring-2">Marketplace</a>
+          </div>
+        </div>
+      </li>
+  
+      <!-- Another Menu Item -->
+      <li class="relative group/item">
+        <a href="#" class="inline-flex h-9 items-center rounded-md px-4 py-2 text-sm font-medium hover:bg-gray-100">Blog</a>
+      </li>
+    </ul>
+  
+    <!-- Indicator (chevron box) -->
+    <div
+      class="absolute top-full left-1/2 z-40 mt-0.5 hidden h-2 w-2 -translate-x-1/2 rotate-45 bg-gray-200 shadow group-[.show-indicator]/navigation-menu:block"
+      data-menu-indicator></div>
+  </div>
+  
+  <!-- JS: Toggle Logic -->
+  <script>
+    document.querySelectorAll('[data-menu-trigger]').forEach((btn) => {
+      const item = btn.closest('.group\\/item');
+      const content = item.querySelector('[data-menu-content]');
+      const nav = btn.closest('.group\\/navigation-menu');
+      const indicator = nav.querySelector('[data-menu-indicator]');
+  
+      btn.addEventListener('click', () => {
+        const isOpen = item.classList.contains('open');
+        document.querySelectorAll('.group\\/item.open').forEach(i => {
+          i.classList.remove('open');
+          i.querySelector('[data-menu-content]').style.display = 'none';
+        });
+  
+        if (!isOpen) {
+          item.classList.add('open');
+          content.style.display = 'block';
+  
+          const rect = item.getBoundingClientRect();
+          indicator.style.left = `${rect.left + rect.width / 2}px`;
+          nav.classList.add('show-indicator');
+          indicator.style.display = 'block';
+        } else {
+          nav.classList.remove('show-indicator');
+          indicator.style.display = 'none';
+        }
+      });
+  
+      // Close on outside click
+      document.addEventListener('click', (e) => {
+        if (!item.contains(e.target)) {
+          item.classList.remove('open');
+          content.style.display = 'none';
+          nav.classList.remove('show-indicator');
+          indicator.style.display = 'none';
+        }
+      });
+    });
+  </script>
+  
