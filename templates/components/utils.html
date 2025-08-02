@@ -1,0 +1,21 @@
+<!-- tailwind must be included elsewhere in your base template -->
+
+<!-- Utility: cn function using clsx + tailwind-merge via CDN -->
+<script type="module">
+    import { clsx } from 'https://cdn.skypack.dev/clsx';
+    import { twMerge } from 'https://cdn.skypack.dev/tailwind-merge';
+  
+    // Global utility function (window.cn) for use anywhere
+    window.cn = (...inputs) => twMerge(clsx(...inputs));
+  
+    // Example usage:
+    const btnClass = cn(
+      'text-sm px-4 py-2',
+      'bg-white text-black',
+      true && 'bg-blue-500 text-white',
+      false && 'opacity-50'
+    );
+  
+    console.log(btnClass); // "text-sm px-4 py-2 bg-blue-500 text-white"
+  </script>
+  
