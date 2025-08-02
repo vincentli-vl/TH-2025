@@ -1,0 +1,74 @@
+<div class="relative" id="carousel" tabindex="0" role="region" aria-roledescription="carousel">
+    <!-- Carousel content wrapper -->
+    <div class="overflow-hidden">
+      <div id="carousel-track" class="flex transition-transform duration-500 ease-in-out -ml-4">
+        <!-- Slide 1 -->
+        <div class="min-w-0 shrink-0 grow-0 basis-full pl-4" role="group" aria-roledescription="slide">
+          <div class="bg-gray-100 p-8 rounded-lg text-center">Slide 1 Content</div>
+        </div>
+        <!-- Slide 2 -->
+        <div class="min-w-0 shrink-0 grow-0 basis-full pl-4" role="group" aria-roledescription="slide">
+          <div class="bg-gray-100 p-8 rounded-lg text-center">Slide 2 Content</div>
+        </div>
+        <!-- Slide 3 -->
+        <div class="min-w-0 shrink-0 grow-0 basis-full pl-4" role="group" aria-roledescription="slide">
+          <div class="bg-gray-100 p-8 rounded-lg text-center">Slide 3 Content</div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Prev button -->
+    <button id="prevBtn" class="absolute size-8 rounded-full top-1/2 -left-12 -translate-y-1/2 bg-white border shadow disabled:opacity-50" aria-label="Previous slide">
+      &#8592;
+    </button>
+  
+    <!-- Next button -->
+    <button id="nextBtn" class="absolute size-8 rounded-full top-1/2 -right-12 -translate-y-1/2 bg-white border shadow disabled:opacity-50" aria-label="Next slide">
+      &#8594;
+    </button>
+  </div>
+  
+  <script>
+    const carousel = document.getElementById("carousel");
+    const track = document.getElementById("carousel-track");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+  
+    let currentSlide = 0;
+    const slides = track.children;
+    const totalSlides = slides.length;
+  
+    function updateCarousel() {
+      const offset = slides[0].offsetWidth * currentSlide;
+      track.style.transform = `translateX(-${offset}px)`;
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+    }
+  
+    prevBtn.addEventListener("click", () => {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateCarousel();
+      }
+    });
+  
+    nextBtn.addEventListener("click", () => {
+      if (currentSlide < totalSlides - 1) {
+        currentSlide++;
+        updateCarousel();
+      }
+    });
+  
+    // Optional: Keyboard support
+    carousel.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") {
+        prevBtn.click();
+      } else if (e.key === "ArrowRight") {
+        nextBtn.click();
+      }
+    });
+  
+    // Initial state
+    updateCarousel();
+  </script>
+  
