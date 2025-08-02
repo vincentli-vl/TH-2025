@@ -2,7 +2,7 @@ import cv2
 from deepface import DeepFace
 import matplotlib.pyplot as plt
 
-image_path = 'happy_face.jpg' # Make sure you have an image with this name in the same directory.
+image_path = 'sad_face.jpg' # Make sure you have an image with this name in the same directory.
 
 try:
     # Analyze the image for emotions. DeepFace handles face detection automatically.
