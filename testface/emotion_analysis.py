@@ -1,24 +1,22 @@
 import cv2
 from deepface import DeepFace
 import matplotlib.pyplot as plt
+import os
 
-image_path = 'disgust_face.jpg' # Make sure you have an image with this name in the same directory.
+# === Setup ===
+image_path = 'disgust_face.jpg'
+results_dir = 'results'
+os.makedirs(results_dir, exist_ok=True)
 
 try:
-    # Analyze the image for emotions. DeepFace handles face detection automatically.
-    # The 'actions' parameter specifies what we want to analyze.
-    analysis = DeepFace.analyze(image_path, actions=['emotion'])
+    # Analyze the image
+    analysis = DeepFace.analyze(img_path=image_path, actions=['emotion'], enforce_detection=True)
 
-    # The 'analysis' object is a list of dictionaries, one for each face detected.
-    # Let's assume there's at least one face and print its analysis.
     if analysis:
-        # Get the first face's analysis.
-        face_analysis = analysis[0]
+        # If only one face is detected, DeepFace returns a dict directly (not a list)
+        face_analysis = analysis[0] if isinstance(analysis, list) else analysis
 
-        # Extract the dominant emotion.
         dominant_emotion = face_analysis['dominant_emotion']
-
-        # Extract the emotion scores (the confidence percentages for each emotion).
         emotion_scores = face_analysis['emotion']
 
         print(f"Analysis for the image '{image_path}':")
@@ -27,28 +25,59 @@ try:
         for emotion, score in emotion_scores.items():
             print(f"- {emotion.capitalize()}: {score:.2f}%")
 
-        # --- Optional: Display the image with the results ---
-        # Load the image using OpenCV.
+        # Load image
         image = cv2.imread(image_path)
+        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-        # Convert the image from BGR (OpenCV default) to RGB for matplotlib.
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        # Get face region from 'region' instead of 'face_area'
+        region = face_analysis.get('region')
+        if region:
+            x, y, w, h = region['x'], region['y'], region['w'], region['h']
 
-        # Get the facial area (bounding box) from the analysis.
-        x, y, w, h = face_analysis['face_area']['x'], face_analysis['face_area']['y'], \
-                     face_analysis['face_area']['w'], face_analysis['face_area']['h']
+            # Draw bounding box and label
+            cv2.rectangle(image_rgb, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            cv2.putText(image_rgb, dominant_emotion, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX,
+                        0.9, (255, 0, 0), 2)
 
-        # Draw a rectangle around the face.
-        cv2.rectangle(image, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            # Optional: Approximate eyes and mouth positions
+            eye_y = y + int(h * 0.3)
+            eye_w = int(w * 0.2)
+            eye_h = int(h * 0.1)
+            mouth_y = y + int(h * 0.75)
+            mouth_h = int(h * 0.1)
 
-        # Put the dominant emotion text on the image.
-        cv2.putText(image, dominant_emotion, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+            # Draw eye boxes
+            cv2.rectangle(image_rgb, (x + int(w * 0.2), eye_y),
+                          (x + int(w * 0.2) + eye_w, eye_y + eye_h), (255, 255, 0), 1)
+            cv2.rectangle(image_rgb, (x + int(w * 0.6), eye_y),
+                          (x + int(w * 0.6) + eye_w, eye_y + eye_h), (255, 255, 0), 1)
 
-        # Display the image using matplotlib.
-        plt.imshow(image)
-        plt.title('Facial Emotion Recognition')
-        plt.axis('off')
-        plt.show()
+            # Draw mouth box
+            cv2.rectangle(image_rgb, (x + int(w * 0.3), mouth_y),
+                          (x + int(w * 0.7), mouth_y + mouth_h), (0, 255, 255), 1)
+        else:
+            print("Warning: Face region not found, skipping face box drawing.")
+
+        # Save annotated image
+        annotated_image_path = os.path.join(results_dir, 'emotion_annotated.png')
+        cv2.imwrite(annotated_image_path, cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR))
+        print(f"Annotated image saved to: {annotated_image_path}")
+
+        # Save emotion score chart
+        emotions = list(emotion_scores.keys())
+        scores = list(emotion_scores.values())
+
+        plt.figure(figsize=(8, 4))
+        plt.bar(emotions, scores, color='skyblue')
+        plt.title('Emotion Confidence Scores')
+        plt.ylabel('Confidence (%)')
+        plt.xticks(rotation=45)
+        plt.tight_layout()
+
+        chart_path = os.path.join(results_dir, 'emotion_scores_chart.png')
+        plt.savefig(chart_path)
+        plt.close()
+        print(f"Emotion chart saved to: {chart_path}")
 
     else:
         print("No faces were detected in the image.")
