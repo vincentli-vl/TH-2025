@@ -4,9 +4,346 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <title>Page Title</title>
+    <title>Voice Recognition App</title>
 </head>
 <body>
     {% block content %}{% endblock %}
+    
+    <script>
+        // Voice Recognition functionality
+        class VoiceRecognition {
+            constructor() {
+                this.recognition = null;
+                this.isRecording = false;
+                this.isSupported = false;
+                this.transcript = '';
+                this.isStarting = false; // Track if we're in the process of starting
+                this.networkRetries = 0;
+                this.maxRetries = 3;
+                this.initSpeechRecognition();
+            }
+
+            async testMicrophone() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    stream.getTracks().forEach(track => track.stop());
+                    return true;
+                } catch (error) {
+                    return false;
+                }
+            }
+
+            initSpeechRecognition() {
+                // Check if speech recognition is supported
+                if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                    this.showError('Speech recognition not supported in this browser. Please use Chrome or Edge.');
+                    this.showTextInputFallback();
+                    return;
+                }
+
+                this.isSupported = true;
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                
+                try {
+                    this.recognition = new SpeechRecognition();
+                    this.recognition.continuous = false; // Changed to false for better control
+                    this.recognition.interimResults = true;
+                    this.recognition.lang = 'en-US';
+                    this.recognition.maxAlternatives = 1;
+
+                    this.recognition.onstart = () => {
+                        this.isStarting = false;
+                        this.networkRetries = 0; // Reset retry counter on successful start
+                        this.updateStatus('Recording started... Speak now!');
+                    };
+
+                    this.recognition.onresult = (event) => {
+                        let interimTranscript = '';
+                        let finalTranscript = '';
+
+                        for (let i = event.resultIndex; i < event.results.length; i++) {
+                            const transcript = event.results[i][0].transcript;
+                            if (event.results[i].isFinal) {
+                                finalTranscript += transcript;
+                            } else {
+                                interimTranscript += transcript;
+                            }
+                        }
+
+                        // Update the transcript
+                        if (finalTranscript) {
+                            this.transcript = finalTranscript;
+                            console.log('Final transcript:', this.transcript);
+                        }
+                        
+                        // Show both final and interim results
+                        const displayText = this.transcript + interimTranscript;
+                        this.updateTranscriptionDisplay(displayText);
+                        
+                        if (interimTranscript) {
+                            console.log('Interim transcript:', interimTranscript);
+                        }
+                    };
+
+                    this.recognition.onerror = (event) => {
+                        this.isStarting = false;
+                        
+                        switch(event.error) {
+                            case 'not-allowed':
+                                this.showError('Microphone access denied. Please allow microphone permissions.');
+                                break;
+                            case 'no-speech':
+                                this.updateStatus('No speech detected. Try speaking louder.');
+                                // Don't stop recording for no-speech, just continue
+                                return;
+                            case 'audio-capture':
+                                this.showError('No microphone found. Please connect a microphone.');
+                                break;
+                            case 'network':
+                                this.handleNetworkError();
+                                break;
+                            case 'aborted':
+                                return; // Don't show error for aborted
+                            default:
+                                this.showError(`Speech recognition error: ${event.error}`);
+                        }
+                        
+                        this.stopRecording();
+                    };
+
+                    this.recognition.onend = () => {
+                        this.isStarting = false;
+                        
+                        // Only restart if we're supposed to be recording
+                        if (this.isRecording) {
+                            setTimeout(() => {
+                                if (this.isRecording && !this.isStarting) {
+                                    this.startRecording();
+                                }
+                            }, 100);
+                        } else {
+                            this.updateStatus('Recording stopped');
+                        }
+                    };
+
+                    this.updateStatus('Ready to record');
+                    
+                } catch (error) {
+                    this.showError('Failed to initialize speech recognition');
+                    this.showTextInputFallback();
+                }
+            }
+
+            handleNetworkError() {
+                this.networkRetries++;
+                if (this.networkRetries <= this.maxRetries) {
+                    this.showError(`Network error (retry ${this.networkRetries}/${this.maxRetries}). Please check your internet connection.`);
+                    
+                    // Wait a bit before retrying
+                    setTimeout(() => {
+                        if (this.isRecording) {
+                            this.startRecording();
+                        }
+                    }, 2000);
+                } else {
+                    this.showError('Network connection failed. Speech recognition requires internet access to Google\'s servers. Use text input below.');
+                    this.showTextInputFallback();
+                }
+            }
+
+            showTextInputFallback() {
+                const fallbackDiv = document.getElementById('text-input-fallback');
+                if (fallbackDiv) {
+                    fallbackDiv.classList.remove('hidden');
+                }
+            }
+
+            async requestMicrophonePermission() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    stream.getTracks().forEach(track => track.stop()); // Stop the stream immediately
+                    return true;
+                } catch (error) {
+                    this.showError('Microphone permission denied. Please allow microphone access and refresh the page.');
+                    return false;
+                }
+            }
+
+            async startRecording() {
+                if (!this.isSupported) {
+                    this.showError('Speech recognition not supported');
+                    return;
+                }
+
+                if (this.isRecording || this.isStarting) {
+                    return;
+                }
+                
+                // Test microphone first
+                const micTest = await this.testMicrophone();
+                if (!micTest) {
+                    this.showError('Microphone test failed. Please check your microphone and permissions.');
+                    return;
+                }
+                
+                // Request microphone permission first
+                const hasPermission = await this.requestMicrophonePermission();
+                if (!hasPermission) {
+                    return;
+                }
+
+                this.isStarting = true;
+                this.isRecording = true;
+                this.transcript = ''; // Reset transcript for new recording session
+                this.updateUI(true);
+                this.updateStatus('Starting recording...');
+                
+                try {
+                    this.recognition.start();
+                } catch (error) {
+                    this.isRecording = false;
+                    this.isStarting = false;
+                    this.updateUI(false);
+                    this.updateStatus('Failed to start recording');
+                }
+            }
+
+            stopRecording() {
+                if (!this.isSupported || !this.isRecording) {
+                    return;
+                }
+
+                this.isRecording = false;
+                this.isStarting = false;
+                this.updateUI(false);
+                this.updateStatus('Processing...');
+                
+                try {
+                    this.recognition.stop();
+                } catch (error) {
+                    // Ignore stop errors
+                }
+                
+                // Send the final transcript to server
+                console.log('Final transcript to send:', this.transcript);
+                if (this.transcript.trim()) {
+                    this.sendTranscriptionToServer(this.transcript);
+                } else {
+                    console.log('No transcript to send');
+                    this.updateStatus('No speech detected');
+                }
+            }
+
+            toggleRecording() {
+                if (this.isRecording || this.isStarting) {
+                    this.stopRecording();
+                } else {
+                    this.startRecording();
+                }
+            }
+
+            updateTranscriptionDisplay(text) {
+                const display = document.getElementById('transcription-display');
+                if (display) {
+                    display.textContent = text;
+                }
+            }
+
+            updateUI(isRecording) {
+                const button = document.getElementById('voice-button');
+                
+                if (button) {
+                    if (isRecording) {
+                        button.classList.add('bg-red-500', 'animate-pulse');
+                        button.classList.remove('bg-blue-500');
+                        button.innerHTML = '🔴 Stop';
+                    } else {
+                        button.classList.remove('bg-red-500', 'animate-pulse');
+                        button.classList.add('bg-blue-500');
+                        button.innerHTML = '🎤 Start';
+                    }
+                }
+            }
+
+            updateStatus(message) {
+                const status = document.getElementById('recording-status');
+                if (status) {
+                    status.textContent = message;
+                    status.className = 'text-gray-500 text-sm';
+                }
+            }
+
+            showError(message) {
+                const status = document.getElementById('recording-status');
+                if (status) {
+                    status.textContent = message;
+                    status.className = 'text-red-500 text-sm font-bold';
+                }
+            }
+
+            async sendTranscriptionToServer(text) {
+                try {
+                    this.updateStatus('Sending to server...');
+                    
+                    const response = await fetch('/transcribe', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ text: text })
+                    });
+
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        this.displayResponse(data.response);
+                        this.updateStatus('Response received');
+                        // Clear the transcription display
+                        document.getElementById('transcription-display').textContent = '';
+                        this.transcript = '';
+                    } else {
+                        console.error('❌ Server error:', data.error);
+                        this.showError('Server error: ' + data.error);
+                    }
+                } catch (error) {
+                    console.error('❌ Network error:', error);
+                    this.showError('Network error: ' + error.message);
+                }
+            }
+
+            displayResponse(response) {
+                const responseDisplay = document.getElementById('response-display');
+                if (responseDisplay) {
+                    responseDisplay.textContent = response;
+                    responseDisplay.classList.add('bg-green-100', 'p-3', 'rounded', 'mt-2');
+                    
+                    // Auto-hide after 5 seconds
+                    setTimeout(() => {
+                        responseDisplay.classList.remove('bg-green-100', 'p-3', 'rounded', 'mt-2');
+                        responseDisplay.textContent = '';
+                    }, 5000);
+                } else {
+                    console.error('❌ Response display element not found!');
+                }
+            }
+
+            // Method to handle text input fallback
+            sendTextInput() {
+                const textInput = document.getElementById('text-input');
+                const text = textInput.value.trim();
+                
+                if (text) {
+                    this.sendTranscriptionToServer(text);
+                    textInput.value = '';
+                }
+            }
+        }
+
+        // Initialize voice recognition when page loads
+        let voiceRecognition;
+        document.addEventListener('DOMContentLoaded', () => {
+            voiceRecognition = new VoiceRecognition();
+        });
+    </script>
 </body>
 </html>
