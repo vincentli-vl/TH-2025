@@ -1,0 +1,150 @@
+<div class="w-full px-4 py-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-2xl font-bold">Journal</h1>
+      <img src="https://github.com/shadcn.png" class="h-8 w-8 rounded-full" alt="User Avatar">
+    </div>
+  
+    <!-- Search and Filter -->
+    <div class="flex items-center gap-2 mb-4">
+      <div class="relative flex-1">
+        <input
+          type="text"
+          placeholder="Search logs..."
+          class="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+        />
+        <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+        </svg>
+      </div>
+      <button class="text-sm text-muted-foreground border rounded-md px-3 py-2 hover:bg-muted">Filter</button>
+    </div>
+  
+    <!-- Tabs -->
+    <div class="mb-4 border-b">
+      <nav class="flex space-x-4 text-sm font-medium" id="tabs">
+        <button class="tab-btn text-muted-foreground px-3 py-2 border-b-2 border-transparent hover:text-primary data-[active=true]:text-primary data-[active=true]:border-primary" data-tab="confusion" data-active="true">Confusion</button>
+        <button class="tab-btn text-muted-foreground px-3 py-2 border-b-2 border-transparent hover:text-primary data-[active=false]:text-primary data-[active=false]:border-transparent" data-tab="medication" data-active="false">Medication</button>
+        <button class="tab-btn text-muted-foreground px-3 py-2 border-b-2 border-transparent hover:text-primary data-[active=false]:text-primary data-[active=false]:border-transparent" data-tab="guest" data-active="false">Guest</button>
+        <button class="tab-btn text-muted-foreground px-3 py-2 border-b-2 border-transparent hover:text-primary data-[active=false]:text-primary data-[active=false]:border-transparent" data-tab="behavior" data-active="false">Behavior</button>
+      </nav>
+    </div>
+  
+    <!-- Tab Content -->
+    <div id="tab-content">
+      <!-- Confusion -->
+      <div class="tab-panel" data-tab="confusion">
+        <div class="space-y-4">
+          <div class="rounded-lg border p-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="text-base font-semibold">Confused by kitchen cabinet</h3>
+                <p class="text-sm text-muted-foreground">Maria was confused about how to open the kitchen cabinet</p>
+              </div>
+              <span class="text-xs text-muted-foreground">2 hours ago</span>
+            </div>
+          </div>
+          <div class="rounded-lg border p-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="text-base font-semibold">Woke up disoriented</h3>
+                <p class="text-sm text-muted-foreground">Maria woke up not knowing where she was</p>
+              </div>
+              <span class="text-xs text-muted-foreground">4 hours ago</span>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Medication -->
+      <div class="tab-panel hidden" data-tab="medication">
+        <div class="space-y-4">
+          <div class="rounded-lg border p-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="text-base font-semibold">Took morning medication</h3>
+                <p class="text-sm text-muted-foreground">Maria took 2 pills of Aricept</p>
+              </div>
+              <span class="text-xs text-muted-foreground">Today at 8:30am</span>
+            </div>
+          </div>
+          <div class="rounded-lg border p-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="text-base font-semibold">Missed evening dose</h3>
+                <p class="text-sm text-muted-foreground">Maria forgot to take evening medication</p>
+              </div>
+              <span class="text-xs text-muted-foreground">Yesterday at 9:00pm</span>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Guest -->
+      <div class="tab-panel hidden" data-tab="guest">
+        <div class="space-y-4">
+          <div class="rounded-lg border p-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="text-base font-semibold">John visited</h3>
+                <p class="text-sm text-muted-foreground">Maria's son visited for lunch</p>
+              </div>
+              <span class="text-xs text-muted-foreground">Yesterday at 12:45pm</span>
+            </div>
+          </div>
+          <div class="rounded-lg border p-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="text-base font-semibold">Caretaker check-in</h3>
+                <p class="text-sm text-muted-foreground">Caretaker checked vitals and cleaned</p>
+              </div>
+              <span class="text-xs text-muted-foreground">Today at 9:15am</span>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Behavior -->
+      <div class="tab-panel hidden" data-tab="behavior">
+        <div class="space-y-4">
+          <div class="rounded-lg border p-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="text-base font-semibold">Agitated in afternoon</h3>
+                <p class="text-sm text-muted-foreground">Maria was pacing and talking loudly</p>
+              </div>
+              <span class="text-xs text-muted-foreground">Today at 3:00pm</span>
+            </div>
+          </div>
+          <div class="rounded-lg border p-4">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="text-base font-semibold">Calm during dinner</h3>
+                <p class="text-sm text-muted-foreground">Maria was calm and talkative over dinner</p>
+              </div>
+              <span class="text-xs text-muted-foreground">Yesterday at 6:30pm</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Tab Logic -->
+  <script>
+    document.querySelectorAll('.tab-btn').forEach(button => {
+      button.addEventListener('click', () => {
+        const tab = button.dataset.tab;
+  
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+          btn.setAttribute('data-active', btn.dataset.tab === tab);
+        });
+  
+        document.querySelectorAll('.tab-panel').forEach(panel => {
+          panel.classList.toggle('hidden', panel.dataset.tab !== tab);
+        });
+      });
+    });
+  </script>
+  
