@@ -1,0 +1,24 @@
+{
+  "name": "th-2025",
+  "version": "1.0.0",
+  "description": "This is a project for the 2025 terra hacks competition",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vincentli-vl/TH-2025.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vincentli-vl/TH-2025/issues"
+  },
+  "homepage": "https://github.com/vincentli-vl/TH-2025#readme",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.1.11",
+    "tailwindcss": "^4.1.11"
+  }
+}
