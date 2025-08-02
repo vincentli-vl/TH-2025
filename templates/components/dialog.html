@@ -1,0 +1,97 @@
+<!-- Dialog Trigger -->
+<button
+  id="dialogTrigger"
+  class="px-4 py-2 text-sm font-medium rounded bg-blue-600 text-white hover:bg-blue-700"
+>
+  Open Dialog
+</button>
+
+<!-- Dialog Overlay + Content -->
+<div
+  id="dialogOverlay"
+  class="fixed inset-0 z-50 bg-black/50 hidden items-center justify-center"
+>
+  <div
+    id="dialogContent"
+    class="relative bg-white rounded-lg border shadow-lg p-6 w-full max-w-lg mx-4 animate-fade-in"
+  >
+    <!-- Close Button -->
+    <button
+      id="dialogClose"
+      class="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+      aria-label="Close"
+    >
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+
+    <!-- Dialog Header -->
+    <div class="flex flex-col gap-2 text-center sm:text-left">
+      <h2 class="text-lg font-semibold leading-none">Dialog Title</h2>
+      <p class="text-sm text-gray-500">This is the dialog description or content area.</p>
+    </div>
+
+    <!-- Dialog Footer -->
+    <div class="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+      <button
+        class="px-4 py-2 rounded text-sm bg-gray-100 hover:bg-gray-200"
+        onclick="closeDialog()"
+      >
+        Cancel
+      </button>
+      <button
+        class="px-4 py-2 rounded text-sm bg-blue-600 text-white hover:bg-blue-700"
+        onclick="closeDialog()"
+      >
+        Confirm
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const dialogTrigger = document.getElementById("dialogTrigger");
+  const dialogOverlay = document.getElementById("dialogOverlay");
+  const dialogClose = document.getElementById("dialogClose");
+
+  dialogTrigger.addEventListener("click", () => {
+    dialogOverlay.classList.remove("hidden");
+    dialogOverlay.classList.add("flex");
+  });
+
+  dialogClose.addEventListener("click", closeDialog);
+
+  function closeDialog() {
+    dialogOverlay.classList.add("hidden");
+    dialogOverlay.classList.remove("flex");
+  }
+
+  // Close when clicking outside the content
+  dialogOverlay.addEventListener("click", (e) => {
+    if (e.target === dialogOverlay) closeDialog();
+  });
+
+  // Optional: Escape key support
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeDialog();
+  });
+</script>
+
+<!-- Optional Fade-In Animation -->
+<style>
+  .animate-fade-in {
+    animation: fadeInZoom 0.2s ease-out;
+  }
+
+  @keyframes fadeInZoom {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+</style>
