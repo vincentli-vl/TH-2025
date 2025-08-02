@@ -1,0 +1,68 @@
+<!-- OTP Input -->
+<div data-slot="input-otp" class="flex items-center gap-2">
+    <div data-slot="input-otp-group" class="flex items-center gap-1">
+      <!-- Slot 1 -->
+      <div
+        data-slot="input-otp-slot"
+        data-active="true"
+        class="relative flex h-9 w-9 items-center justify-center text-sm border border-input border-l rounded-l-md bg-white outline-none ring-2 ring-ring/50 z-10"
+      >
+        <span>3</span>
+        <!-- Fake Caret -->
+        <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
+          <div class="animate-caret-blink bg-black h-4 w-px duration-1000"></div>
+        </div>
+      </div>
+  
+      <!-- Slot 2 -->
+      <div
+        data-slot="input-otp-slot"
+        class="relative flex h-9 w-9 items-center justify-center text-sm border-y border-r border-input bg-white outline-none"
+      >
+        <span>8</span>
+      </div>
+  
+      <!-- Slot 3 -->
+      <div
+        data-slot="input-otp-slot"
+        class="relative flex h-9 w-9 items-center justify-center text-sm border-y border-r border-input bg-white outline-none"
+      >
+        <span>4</span>
+      </div>
+    </div>
+  
+    <!-- Separator -->
+    <div data-slot="input-otp-separator" role="separator" class="text-gray-400">
+      <!-- MinusIcon -->
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="5" y1="12" x2="19" y2="12" />
+      </svg>
+    </div>
+  
+    <div data-slot="input-otp-group" class="flex items-center gap-1">
+      <!-- Slot 4 -->
+      <div
+        data-slot="input-otp-slot"
+        class="relative flex h-9 w-9 items-center justify-center text-sm border-y border-r border-input bg-white outline-none"
+      >
+        <span>1</span>
+      </div>
+  
+      <!-- Slot 5 -->
+      <div
+        data-slot="input-otp-slot"
+        class="relative flex h-9 w-9 items-center justify-center text-sm border-y border-r border-input bg-white outline-none"
+      >
+        <span>0</span>
+      </div>
+  
+      <!-- Slot 6 -->
+      <div
+        data-slot="input-otp-slot"
+        class="relative flex h-9 w-9 items-center justify-center text-sm border-y border-r border-input rounded-r-md bg-white outline-none"
+      >
+        <span>5</span>
+      </div>
+    </div>
+  </div>
+  
