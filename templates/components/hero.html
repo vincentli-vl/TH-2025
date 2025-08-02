@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Hero Section -->
+<section class="relative px-6 py-24 lg:px-8 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200">
+  <div class="mx-auto max-w-5xl text-center mb-12">
+    <div class="flex justify-center mb-8">
+      <div class="flex items-center gap-4">
+        <div class="w-20 h-20 bg-pink-500 rounded-2xl flex items-center justify-center shadow-xl">
+          <i data-lucide="heart" class="w-10 h-10 text-white"></i>
+        </div>
+        <div class="text-left">
+          <h1 class="text-5xl lg:text-7xl font-medium text-pink-600 mb-2">Echocare</h1>
+          <p class="text-lg text-gray-600">Dementia Care Companion</p>
+        </div>
+      </div>
+    </div>
+    <h2 class="text-3xl lg:text-5xl font-medium text-gray-900 mb-6 leading-tight">
+      Supporting Your Family Through <br />
+      <span class="text-pink-600">Memory Challenges</span>
+    </h2>
+    <p class="text-lg text-gray-600 mb-8 max-w-3xl mx-auto">
+      Echocare helps families monitor and support their loved ones with Alzheimer's and dementia.
+      Track daily activities, log important events, and coordinate care with voice and face recognition technology.
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+      <a href="#" class="bg-pink-600 text-white px-8 py-4 rounded-xl text-lg flex items-center">
+        Start Today <i data-lucide="arrow-right" class="ml-2 w-6 h-6"></i>
+      </a>
+      <a href="#" class="border border-pink-600 text-pink-600 px-8 py-4 rounded-xl text-lg">
+        Learn More
+      </a>
+    </div>
+    <div class="mt-8 text-center text-sm text-gray-500">
+      Trusted by families caring for their loved ones with dementia
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="px-6 py-24 lg:px-8">
+  <div class="mx-auto max-w-6xl text-center">
+    <div class="inline-flex items-center gap-2 bg-pink-100 text-pink-600 px-4 py-2 rounded-full mb-4">
+      <i data-lucide="heart" class="h-4 w-4"></i>
+      <span class="text-sm font-medium">Powered by Echocare Technology</span>
+    </div>
+    <h2 class="text-3xl font-medium text-gray-800 mb-4">Everything You Need to Care</h2>
+    <p class="text-lg text-gray-600 max-w-3xl mx-auto mb-12">
+      Comprehensive monitoring and logging tools designed to help families provide better care and stay connected.
+    </p>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 text-left">
+      {% set features = [
+        ['eye', 'Face Recognition', 'Automatically recognizes family members and tracks visitor interactions.'],
+        ['mic', 'Familiar Voices', 'Uses custom-recorded voices to provide comfort in familiar tones.'],
+        ['clock', 'Activity Monitoring', 'Tracks routines, medication schedules, and behavior patterns.'],
+        ['users', 'Memory Episode Logging', 'Records and tracks confusion events to find triggers.'],
+        ['shield', 'Safe & Secure', 'Privacy-focused design ensures all data is protected.'],
+        ['heart', 'Family Dashboard', 'Centralized monitoring for families to stay informed.']
+      ] %}
+      {% for icon, title, desc in features %}
+      <div class="p-6 border rounded-xl shadow-sm hover:shadow-md transition-shadow">
+        <div class="w-14 h-14 bg-pink-100 rounded-2xl flex items-center justify-center mb-4">
+          <i data-lucide="{{ icon }}" class="h-6 w-6 text-pink-600"></i>
+        </div>
+        <h3 class="text-xl font-semibold mb-2">{{ title }}</h3>
+        <p class="text-gray-600">{{ desc }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="px-6 py-24 lg:px-8 bg-gradient-to-br from-pink-100 via-white to-gray-50 text-center">
+  <div class="max-w-4xl mx-auto">
+    <h2 class="text-4xl font-medium text-gray-800 mb-2">Ready to start caring with</h2>
+    <h3 class="text-5xl font-medium text-pink-600 mb-4">Echocare?</h3>
+    <p class="text-lg text-gray-600 mb-8">
+      Join families already using Echocare to provide better, more coordinated care.
+    </p>
+    <a href="#" class="bg-pink-600 text-white px-10 py-4 rounded-xl text-lg inline-flex items-center">
+      Begin Your Care Journey <i data-lucide="arrow-right" class="ml-2 w-6 h-6"></i>
+    </a>
+    <div class="mt-6 text-sm text-gray-500">
+      No credit card required • 30-day free trial • Setup in minutes
+    </div>
+  </div>
+</section>
+
+<script>
+  lucide.createIcons();
+</script>
+
+{% endblock %}
