@@ -1,0 +1,84 @@
+<!-- Sidebar Toggle (Mobile Only) -->
+<button id="sidebar-toggle" class="fixed top-4 left-4 z-50 p-2 rounded-lg bg-white shadow md:hidden">
+    <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+    </svg>
+  </button>
+  
+  <!-- Sidebar Backdrop (Mobile) -->
+  <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-30 hidden z-40 md:hidden"></div>
+  
+  <!-- Sidebar -->
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 transform -translate-x-full md:translate-x-0 md:static md:block bg-white border-r shadow-sm transition-transform duration-300 ease-in-out">
+    <div class="h-full flex flex-col">
+      <!-- Logo -->
+      <div class="px-6 py-4 border-b">
+        <span class="text-xl font-bold">App Name</span>
+      </div>
+  
+      <!-- Navigation -->
+      <nav class="flex-1 overflow-y-auto px-2 py-4 space-y-6">
+        <!-- Group: Overview -->
+        <div>
+          <p class="text-xs font-semibold text-gray-500 uppercase px-2 mb-2">Overview</p>
+          <a href="#" class="group flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">
+            <svg class="w-4 h-4 text-gray-500 group-hover:text-gray-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18M3 6h18M3 18h18"/>
+            </svg>
+            Dashboard
+          </a>
+          <a href="#" class="group flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">
+            <svg class="w-4 h-4 text-gray-500 group-hover:text-gray-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" />
+            </svg>
+            Analytics
+          </a>
+        </div>
+  
+        <!-- Group: Settings -->
+        <div>
+          <p class="text-xs font-semibold text-gray-500 uppercase px-2 mb-2">Settings</p>
+          <a href="#" class="group flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">
+            <svg class="w-4 h-4 text-gray-500 group-hover:text-gray-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M12 15v2m-6.928-3.928l1.414 1.414M6 12H4m3.072-4.072L6.658 6.514M12 9V7m6.928 3.928l-1.414-1.414M18 12h2m-3.072 4.072l1.414 1.414" />
+            </svg>
+            Preferences
+          </a>
+          <a href="#" class="group flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100">
+            <svg class="w-4 h-4 text-gray-500 group-hover:text-gray-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M9 12l2 2 4-4" />
+            </svg>
+            Security
+          </a>
+        </div>
+      </nav>
+  
+      <!-- Footer / Action -->
+      <div class="px-4 py-4 border-t">
+        <button class="w-full flex items-center justify-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M17 16l4-4m0 0l-4-4m4 4H7" />
+          </svg>
+          Logout
+        </button>
+      </div>
+    </div>
+  </aside>
+  
+  <!-- Script: Mobile Sidebar Toggle -->
+  <script>
+    const toggleBtn = document.getElementById('sidebar-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('sidebar-backdrop');
+  
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('-translate-x-full');
+      backdrop.classList.toggle('hidden');
+    });
+  
+    backdrop.addEventListener('click', () => {
+      sidebar.classList.add('-translate-x-full');
+      backdrop.classList.add('hidden');
+    });
+  </script>
+  
