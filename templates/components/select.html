@@ -1,0 +1,92 @@
+<!-- Select Component -->
+<div class="relative inline-block w-64" data-select>
+    <!-- Trigger -->
+    <button
+      type="button"
+      class="select-trigger flex w-full items-center justify-between gap-2 rounded-md border border-input bg-white px-3 py-2 text-sm shadow-sm outline-none transition focus:ring-2 focus:ring-ring/50 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+      aria-haspopup="listbox"
+      aria-expanded="false"
+    >
+      <span class="select-value text-gray-900">Select an option</span>
+      <svg class="size-4 opacity-50 pointer-events-none" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
+  
+    <!-- Content -->
+    <ul
+      class="select-content absolute z-50 mt-1 hidden max-h-60 w-full overflow-auto rounded-md border border-gray-200 bg-white text-sm shadow-md focus:outline-none"
+      role="listbox"
+    >
+      <!-- Option Item -->
+      <li
+        class="select-item flex cursor-pointer items-center justify-between px-3 py-2 hover:bg-gray-100 focus:bg-gray-100"
+        role="option"
+        data-value="apple"
+      >
+        Apple
+        <svg class="check-icon hidden size-4 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+        </svg>
+      </li>
+      <li
+        class="select-item flex cursor-pointer items-center justify-between px-3 py-2 hover:bg-gray-100 focus:bg-gray-100"
+        role="option"
+        data-value="banana"
+      >
+        Banana
+        <svg class="check-icon hidden size-4 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+        </svg>
+      </li>
+      <li
+        class="select-item flex cursor-pointer items-center justify-between px-3 py-2 hover:bg-gray-100 focus:bg-gray-100"
+        role="option"
+        data-value="cherry"
+      >
+        Cherry
+        <svg class="check-icon hidden size-4 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+        </svg>
+      </li>
+    </ul>
+  </div>
+  
+  <script>
+    const select = document.querySelector('[data-select]');
+    const trigger = select.querySelector('.select-trigger');
+    const content = select.querySelector('.select-content');
+    const value = select.querySelector('.select-value');
+    const items = select.querySelectorAll('.select-item');
+  
+    // Toggle dropdown
+    trigger.addEventListener('click', () => {
+      const expanded = trigger.getAttribute('aria-expanded') === 'true';
+      trigger.setAttribute('aria-expanded', String(!expanded));
+      content.classList.toggle('hidden');
+    });
+  
+    // Handle selection
+    items.forEach((item) => {
+      item.addEventListener('click', () => {
+        value.textContent = item.textContent.trim();
+        content.classList.add('hidden');
+        trigger.setAttribute('aria-expanded', 'false');
+  
+        // Remove all checkmarks
+        select.querySelectorAll('.check-icon').forEach((icon) => {
+          icon.classList.add('hidden');
+        });
+        item.querySelector('.check-icon').classList.remove('hidden');
+      });
+    });
+  
+    // Close on outside click
+    document.addEventListener('click', (e) => {
+      if (!select.contains(e.target)) {
+        content.classList.add('hidden');
+        trigger.setAttribute('aria-expanded', 'false');
+      }
+    });
+  </script>
+  
