@@ -1,0 +1,90 @@
+<!-- Trigger Button -->
+<button
+  id="drawerTrigger"
+  class="px-4 py-2 text-sm font-medium rounded bg-blue-600 text-white hover:bg-blue-700"
+>
+  Open Drawer
+</button>
+
+<!-- Drawer Overlay + Content -->
+<div
+  id="drawerOverlay"
+  class="fixed inset-0 z-50 bg-black/50 hidden"
+>
+  <!-- Drawer Content (Bottom) -->
+  <div
+    id="drawerContent"
+    class="fixed bottom-0 left-0 right-0 z-50 flex flex-col max-h-[80vh] rounded-t-lg border-t bg-white animate-slide-up shadow-lg"
+  >
+    <!-- Drag Handle (Optional) -->
+    <div class="bg-gray-200 mx-auto mt-4 h-2 w-[100px] rounded-full"></div>
+
+    <!-- Drawer Header -->
+    <div class="flex flex-col gap-1.5 p-4">
+      <h2 class="text-base font-semibold">Drawer Title</h2>
+      <p class="text-sm text-gray-500">This is a description inside the drawer.</p>
+    </div>
+
+    <!-- Drawer Body -->
+    <div class="p-4 overflow-y-auto">
+      <p class="text-sm text-gray-600">
+        Add your drawer content here. It can scroll if necessary.
+      </p>
+    </div>
+
+    <!-- Drawer Footer -->
+    <div class="mt-auto flex flex-col gap-2 p-4">
+      <button
+        class="w-full px-4 py-2 rounded text-sm bg-gray-100 hover:bg-gray-200"
+        onclick="closeDrawer()"
+      >
+        Cancel
+      </button>
+      <button
+        class="w-full px-4 py-2 rounded text-sm bg-blue-600 text-white hover:bg-blue-700"
+        onclick="closeDrawer()"
+      >
+        Confirm
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const drawerTrigger = document.getElementById("drawerTrigger");
+  const drawerOverlay = document.getElementById("drawerOverlay");
+
+  drawerTrigger.addEventListener("click", () => {
+    drawerOverlay.classList.remove("hidden");
+  });
+
+  function closeDrawer() {
+    drawerOverlay.classList.add("hidden");
+  }
+
+  // Click outside content to close
+  drawerOverlay.addEventListener("click", (e) => {
+    if (e.target === drawerOverlay) closeDrawer();
+  });
+
+  // Close with ESC key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeDrawer();
+  });
+</script>
+
+<!-- Optional Slide-Up Animation -->
+<style>
+  @keyframes slideUp {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0%);
+    }
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.25s ease-out;
+  }
+</style>
