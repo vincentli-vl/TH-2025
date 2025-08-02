@@ -1,0 +1,54 @@
+<div class="relative w-full max-w-md px-2">
+    <!-- Track -->
+    <div class="relative h-4 bg-gray-200 rounded-full">
+      <!-- Range -->
+      <div id="slider-range" class="absolute h-full bg-blue-500 rounded-full" style="width: 50%;"></div>
+      <!-- Thumb -->
+      <div
+        id="slider-thumb"
+        class="absolute top-1/2 left-1/2 size-4 -translate-x-1/2 -translate-y-1/2 transform bg-white border border-blue-500 rounded-full shadow-sm cursor-pointer transition hover:ring-4 focus-visible:ring-4 ring-blue-300"
+        tabindex="0"
+        role="slider"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="50"
+      ></div>
+    </div>
+  </div>
+  
+  <script>
+    const track = document.querySelector(".relative.h-4.bg-gray-200");
+    const thumb = document.getElementById("slider-thumb");
+    const range = document.getElementById("slider-range");
+  
+    const min = 0;
+    const max = 100;
+  
+    function updateSlider(positionX) {
+      const rect = track.getBoundingClientRect();
+      let percent = (positionX - rect.left) / rect.width;
+      percent = Math.max(0, Math.min(1, percent));
+      const value = Math.round(min + percent * (max - min));
+  
+      range.style.width = `${percent * 100}%`;
+      thumb.style.left = `${percent * 100}%`;
+      thumb.setAttribute("aria-valuenow", value);
+    }
+  
+    function onPointerMove(e) {
+      updateSlider(e.clientX);
+    }
+  
+    thumb.addEventListener("pointerdown", (e) => {
+      e.preventDefault();
+      document.addEventListener("pointermove", onPointerMove);
+      document.addEventListener("pointerup", () => {
+        document.removeEventListener("pointermove", onPointerMove);
+      }, { once: true });
+    });
+  
+    track.addEventListener("click", (e) => {
+      updateSlider(e.clientX);
+    });
+  </script>
+  
