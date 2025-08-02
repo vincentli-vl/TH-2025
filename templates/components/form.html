@@ -1,0 +1,99 @@
+<!-- Static DropdownMenu FormField with validation and radio items -->
+
+<div class="grid gap-2" data-slot="form-item">
+    <!-- Label -->
+    <label
+      for="dropdown-form-field"
+      data-slot="form-label"
+      class="text-sm font-medium peer-invalid:text-red-500"
+    >
+      Favorite Fruit
+    </label>
+  
+    <!-- Dropdown Trigger -->
+    <div class="relative" data-slot="form-control">
+      <button
+        type="button"
+        id="dropdown-form-field"
+        aria-haspopup="true"
+        aria-expanded="false"
+        aria-controls="dropdown-menu"
+        class="w-full rounded-md border px-3 py-2 text-left text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        onclick="toggleDropdown('dropdown-menu')"
+      >
+        <span id="dropdown-selected">Select an option</span>
+      </button>
+  
+      <!-- Dropdown Content -->
+      <div
+        id="dropdown-menu"
+        class="absolute z-50 mt-2 hidden w-full min-w-[8rem] rounded-md border bg-white shadow-md"
+        role="menu"
+        aria-labelledby="dropdown-form-field"
+      >
+        <button
+          class="flex w-full items-center px-2 py-1.5 text-sm hover:bg-gray-100"
+          onclick="selectDropdownItem('Apple')"
+          role="menuitem"
+        >
+          🍎 Apple
+        </button>
+        <button
+          class="flex w-full items-center px-2 py-1.5 text-sm hover:bg-gray-100"
+          onclick="selectDropdownItem('Banana')"
+          role="menuitem"
+        >
+          🍌 Banana
+        </button>
+        <button
+          class="flex w-full items-center px-2 py-1.5 text-sm hover:bg-gray-100"
+          onclick="selectDropdownItem('Orange')"
+          role="menuitem"
+        >
+          🍊 Orange
+        </button>
+      </div>
+    </div>
+  
+    <!-- Description -->
+    <p class="text-muted-foreground text-sm" id="dropdown-description" data-slot="form-description">
+      Pick your favorite fruit from the list.
+    </p>
+  
+    <!-- Message -->
+    <p
+      class="text-destructive text-sm hidden"
+      id="dropdown-error"
+      data-slot="form-message"
+    >
+      Please select a fruit.
+    </p>
+  </div>
+  
+  <script>
+    function toggleDropdown(id) {
+      const dropdown = document.getElementById(id);
+      dropdown.classList.toggle("hidden");
+      const expanded = dropdown.classList.contains("hidden") ? "false" : "true";
+      document.getElementById("dropdown-form-field").setAttribute("aria-expanded", expanded);
+    }
+  
+    function selectDropdownItem(label) {
+      document.getElementById("dropdown-selected").textContent = label;
+      document.getElementById("dropdown-menu").classList.add("hidden");
+  
+      // Fake "validation": hide error on selection
+      document.getElementById("dropdown-error").classList.add("hidden");
+    }
+  
+    // Example validation (you can call this on form submission)
+    function validateDropdown() {
+      const selected = document.getElementById("dropdown-selected").textContent;
+      if (selected === "Select an option") {
+        document.getElementById("dropdown-error").classList.remove("hidden");
+        return false;
+      }
+      return true;
+    }
+  </script>
+  
