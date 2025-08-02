@@ -1,0 +1,61 @@
+<div class="flex flex-col gap-2" data-slot="tabs">
+    <!-- Tab List -->
+    <div
+      class="bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-xl p-[3px] flex"
+      role="tablist"
+      data-slot="tabs-list"
+    >
+      <button
+        class="text-foreground dark:text-muted-foreground inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-xl border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 data-[state=active]:bg-card dark:data-[state=active]:text-foreground dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30"
+        data-tab-trigger="tab1"
+        data-state="active"
+        role="tab"
+        aria-selected="true"
+      >
+        Tab 1
+      </button>
+      <button
+        class="text-foreground dark:text-muted-foreground inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-xl border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1"
+        data-tab-trigger="tab2"
+        data-state="inactive"
+        role="tab"
+        aria-selected="false"
+      >
+        Tab 2
+      </button>
+    </div>
+  
+    <!-- Tab Content -->
+    <div class="flex-1 outline-none" data-tab-content="tab1" data-slot="tabs-content">
+      <p>This is content for Tab 1.</p>
+    </div>
+    <div class="flex-1 outline-none hidden" data-tab-content="tab2" data-slot="tabs-content">
+      <p>This is content for Tab 2.</p>
+    </div>
+  </div>
+  
+  <script>
+    const triggers = document.querySelectorAll("[data-tab-trigger]");
+    const contents = document.querySelectorAll("[data-tab-content]");
+  
+    triggers.forEach((trigger) => {
+      trigger.addEventListener("click", () => {
+        const target = trigger.getAttribute("data-tab-trigger");
+  
+        triggers.forEach((t) => {
+          t.setAttribute("data-state", "inactive");
+          t.setAttribute("aria-selected", "false");
+        });
+        trigger.setAttribute("data-state", "active");
+        trigger.setAttribute("aria-selected", "true");
+  
+        contents.forEach((c) => {
+          c.classList.add("hidden");
+          if (c.getAttribute("data-tab-content") === target) {
+            c.classList.remove("hidden");
+          }
+        });
+      });
+    });
+  </script>
+  
