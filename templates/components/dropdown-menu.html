@@ -1,0 +1,106 @@
+<!-- Trigger -->
+<button
+  id="dropdownTrigger"
+  class="px-4 py-2 text-sm font-medium rounded bg-blue-600 text-white hover:bg-blue-700"
+>
+  Open Menu
+</button>
+
+<!-- Dropdown Menu -->
+<div
+  id="dropdownMenu"
+  class="absolute mt-2 hidden min-w-[12rem] rounded-md border bg-white shadow-md z-50"
+>
+  <!-- Label -->
+  <div class="px-3 py-2 text-sm font-medium text-gray-700">Quick Actions</div>
+
+  <!-- Regular Item -->
+  <button
+    class="w-full text-left flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100"
+  >
+    Edit
+    <span class="ml-auto text-xs text-gray-400 tracking-widest">⌘E</span>
+  </button>
+
+  <!-- Destructive Item -->
+  <button
+    class="w-full text-left flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50"
+  >
+    Delete
+  </button>
+
+  <!-- Separator -->
+  <div class="my-1 h-px bg-gray-200"></div>
+
+  <!-- Checkbox Item -->
+  <label
+    class="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer"
+  >
+    <input type="checkbox" class="form-checkbox" id="checkboxItem" />
+    Show Hidden Files
+  </label>
+
+  <!-- Radio Group -->
+  <fieldset class="px-3 py-2">
+    <legend class="text-sm font-medium text-gray-700 mb-1">View</legend>
+    <label class="flex items-center gap-2 text-sm cursor-pointer">
+      <input type="radio" name="view" value="list" class="form-radio" checked />
+      List
+    </label>
+    <label class="flex items-center gap-2 text-sm cursor-pointer">
+      <input type="radio" name="view" value="grid" class="form-radio" />
+      Grid
+    </label>
+  </fieldset>
+
+  <!-- Submenu Trigger -->
+  <div class="relative group">
+    <button
+      class="w-full text-left flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100"
+    >
+      More Tools
+      <svg
+        class="ml-auto size-4 text-gray-400"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+      >
+        <path d="M9 6l6 6-6 6" />
+      </svg>
+    </button>
+
+    <!-- Submenu -->
+    <div
+      class="absolute top-0 left-full ml-1 hidden min-w-[10rem] rounded-md border bg-white shadow-md group-hover:block z-50"
+    >
+      <button class="w-full text-left px-3 py-2 text-sm hover:bg-gray-100">
+        Settings
+      </button>
+      <button class="w-full text-left px-3 py-2 text-sm hover:bg-gray-100">
+        Extensions
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const trigger = document.getElementById("dropdownTrigger");
+  const menu = document.getElementById("dropdownMenu");
+
+  trigger.addEventListener("click", (e) => {
+    menu.classList.toggle("hidden");
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener("click", (e) => {
+    if (!trigger.contains(e.target) && !menu.contains(e.target)) {
+      menu.classList.add("hidden");
+    }
+  });
+
+  // Optional: close on ESC
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") menu.classList.add("hidden");
+  });
+</script>
