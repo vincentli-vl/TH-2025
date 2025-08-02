@@ -1,0 +1,62 @@
+<div class="relative max-h-64 w-full overflow-hidden rounded-md border">
+    <!-- Viewport -->
+    <div
+      class="scroll-area-viewport size-full overflow-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2"
+    >
+      <div class="p-4 min-w-[600px] min-h-[300px]">
+        <!-- Your scrollable content here -->
+        <p>Scrollable content goes here...</p>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque rutrum sapien nec felis bibendum.</p>
+        <p>Phasellus vestibulum augue nec tellus volutpat, nec feugiat dolor convallis.</p>
+        <p>Aliquam erat volutpat. Vivamus sollicitudin, magna nec blandit feugiat, erat lorem faucibus nisi, a accumsan leo erat vel sem.</p>
+        <p>More content... Repeat to test scrolling...</p>
+        <p>More content... Repeat to test scrolling...</p>
+        <p>More content... Repeat to test scrolling...</p>
+        <p>More content... Repeat to test scrolling...</p>
+      </div>
+    </div>
+  
+    <!-- Vertical Scrollbar -->
+    <div class="scrollbar-vertical absolute right-0 top-0 h-full w-2.5 p-px select-none">
+      <div class="thumb bg-gray-300 rounded-full w-full relative"></div>
+    </div>
+  
+    <!-- Horizontal Scrollbar -->
+    <div class="scrollbar-horizontal absolute bottom-0 left-0 h-2.5 w-full p-px select-none">
+      <div class="thumb bg-gray-300 rounded-full h-full relative"></div>
+    </div>
+  </div>
+  
+  <style>
+    /* Scroll thumb size sync via JS */
+    .scrollbar-vertical .thumb {
+      height: 20%;
+      top: 0;
+    }
+  
+    .scrollbar-horizontal .thumb {
+      width: 20%;
+      left: 0;
+    }
+  </style>
+  
+  <script>
+    const viewport = document.querySelector(".scroll-area-viewport");
+    const vThumb = document.querySelector(".scrollbar-vertical .thumb");
+    const hThumb = document.querySelector(".scrollbar-horizontal .thumb");
+  
+    function updateScrollbars() {
+      const heightRatio = viewport.clientHeight / viewport.scrollHeight;
+      vThumb.style.height = `${heightRatio * 100}%`;
+      vThumb.style.top = `${(viewport.scrollTop / viewport.scrollHeight) * 100}%`;
+  
+      const widthRatio = viewport.clientWidth / viewport.scrollWidth;
+      hThumb.style.width = `${widthRatio * 100}%`;
+      hThumb.style.left = `${(viewport.scrollLeft / viewport.scrollWidth) * 100}%`;
+    }
+  
+    viewport.addEventListener("scroll", updateScrollbars);
+    window.addEventListener("resize", updateScrollbars);
+    updateScrollbars();
+  </script>
+  
