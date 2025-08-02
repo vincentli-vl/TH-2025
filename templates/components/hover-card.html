@@ -1,0 +1,26 @@
+<!-- Hover Card -->
+<div class="relative group inline-block" data-slot="hover-card">
+    <!-- Trigger -->
+    <button
+      type="button"
+      data-slot="hover-card-trigger"
+      aria-describedby="hovercard-content"
+      class="text-sm font-medium underline decoration-dotted underline-offset-2"
+    >
+      Hover over me
+    </button>
+  
+    <!-- Content -->
+    <div
+      id="hovercard-content"
+      data-slot="hover-card-content"
+      role="tooltip"
+      class="pointer-events-none absolute z-50 mt-2 w-64 rounded-md border bg-white p-4 text-sm text-gray-700 shadow-md opacity-0 transition-all duration-200 ease-in-out group-hover:pointer-events-auto group-hover:opacity-100 group-hover:translate-y-0 -translate-y-2"
+    >
+      <div class="font-semibold mb-1">HoverCard Title</div>
+      <p>
+        This is additional content that appears when hovering over the trigger.
+      </p>
+    </div>
+  </div>
+  
