@@ -1,0 +1,58 @@
+<div class="flex w-full h-64 border rounded overflow-hidden">
+    <!-- Left Panel -->
+    <div id="panel-left" class="bg-gray-100 w-1/2 min-w-[10%] max-w-[90%] overflow-auto">
+      <div class="p-4">Left Panel</div>
+    </div>
+  
+    <!-- Resize Handle -->
+    <div
+      id="resizer"
+      class="w-1 bg-gray-300 cursor-col-resize relative group"
+    >
+      <!-- Optional Handle Icon -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        <div class="h-4 w-3 border bg-white flex items-center justify-center rounded-sm shadow group-hover:shadow-md">
+          <svg class="w-2.5 h-2.5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M9 5h6M9 12h6M9 19h6" />
+          </svg>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Right Panel -->
+    <div id="panel-right" class="flex-1 bg-white overflow-auto">
+      <div class="p-4">Right Panel</div>
+    </div>
+  </div>
+  
+  <script>
+    const resizer = document.getElementById("resizer");
+    const leftPanel = document.getElementById("panel-left");
+    const rightPanel = document.getElementById("panel-right");
+  
+    let isDragging = false;
+  
+    resizer.addEventListener("mousedown", function (e) {
+      e.preventDefault();
+      isDragging = true;
+      document.body.style.cursor = "col-resize";
+    });
+  
+    window.addEventListener("mousemove", function (e) {
+      if (!isDragging) return;
+  
+      const containerRect = leftPanel.parentElement.getBoundingClientRect();
+      const offsetX = e.clientX - containerRect.left;
+      const percent = (offsetX / containerRect.width) * 100;
+  
+      if (percent > 10 && percent < 90) {
+        leftPanel.style.width = `${percent}%`;
+      }
+    });
+  
+    window.addEventListener("mouseup", function () {
+      isDragging = false;
+      document.body.style.cursor = "";
+    });
+  </script>
+  
