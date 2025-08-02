@@ -48,8 +48,6 @@ def scan(out, cam):
 		pass	
 
 	cv2.imwrite(f"./{out}", f)
-		
-
 
 def loop():
 	while True:
