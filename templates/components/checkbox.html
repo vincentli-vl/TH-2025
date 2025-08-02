@@ -1,0 +1,40 @@
+<label class="inline-flex items-center gap-2 cursor-pointer select-none">
+    <input
+      type="checkbox"
+      class="peer hidden"
+      id="custom-checkbox"
+      onchange="updateCheckboxIcon(this)"
+    />
+    <span
+      class="checkbox-icon flex size-4 shrink-0 items-center justify-center rounded-[4px] border border-gray-300 bg-gray-100 shadow-xs transition-shadow peer-checked:bg-blue-600 peer-checked:text-white peer-checked:border-blue-600 dark:bg-gray-800 dark:peer-checked:bg-blue-600 dark:peer-checked:border-blue-600"
+    >
+      <svg
+        class="hidden size-3.5"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="3"
+        viewBox="0 0 24 24"
+      >
+        <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </span>
+    <span class="text-sm text-gray-700 dark:text-gray-300">Custom Checkbox</span>
+  </label>
+  
+  <script>
+    function updateCheckboxIcon(checkbox) {
+      const svg = checkbox.nextElementSibling.querySelector("svg");
+      if (checkbox.checked) {
+        svg.classList.remove("hidden");
+      } else {
+        svg.classList.add("hidden");
+      }
+    }
+  
+    // Initialize icon on page load (for SSR consistency)
+    document.addEventListener("DOMContentLoaded", () => {
+      const cb = document.getElementById("custom-checkbox");
+      if (cb) updateCheckboxIcon(cb);
+    });
+  </script>
+  
