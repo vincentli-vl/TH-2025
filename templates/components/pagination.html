@@ -1,0 +1,128 @@
+<nav
+  role="navigation"
+  aria-label="pagination"
+  class="mx-auto flex w-full justify-center"
+>
+  <ul class="flex flex-row items-center gap-1" id="pagination">
+    <!-- Previous -->
+    <li>
+      <button
+        aria-label="Go to previous page"
+        class="inline-flex h-9 items-center gap-1 rounded-md border px-2.5 text-sm font-medium hover:bg-gray-100 disabled:opacity-50"
+        id="prevPage"
+        disabled
+      >
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M15 18l-6-6 6-6"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <span class="hidden sm:inline">Previous</span>
+      </button>
+    </li>
+
+    <!-- Page Numbers (injected by JS) -->
+    <!-- Placeholder -->
+
+    <!-- Next -->
+    <li>
+      <button
+        aria-label="Go to next page"
+        class="inline-flex h-9 items-center gap-1 rounded-md border px-2.5 text-sm font-medium hover:bg-gray-100"
+        id="nextPage"
+      >
+        <span class="hidden sm:inline">Next</span>
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M9 6l6 6-6 6"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+    </li>
+  </ul>
+</nav>
+
+<script>
+  const pagination = document.getElementById("pagination");
+  const prevBtn = document.getElementById("prevPage");
+  const nextBtn = document.getElementById("nextPage");
+
+  const totalPages = 7;
+  let currentPage = 1;
+
+  function renderPages() {
+    // Remove old page buttons
+    document.querySelectorAll(".page-btn").forEach((el) => el.remove());
+
+    // Insert pages
+    for (let i = 1; i <= totalPages; i++) {
+      if (
+        i === 1 ||
+        i === totalPages ||
+        (i >= currentPage - 1 && i <= currentPage + 1)
+      ) {
+        const li = document.createElement("li");
+        const a = document.createElement("button");
+        a.className =
+          "page-btn inline-flex h-9 w-9 items-center justify-center rounded-md border text-sm font-medium hover:bg-gray-100 " +
+          (i === currentPage
+            ? "bg-gray-100 border-gray-400"
+            : "bg-white border-transparent");
+        a.textContent = i;
+        a.setAttribute("aria-current", i === currentPage ? "page" : "false");
+        a.addEventListener("click", () => {
+          currentPage = i;
+          updatePagination();
+        });
+        li.appendChild(a);
+        pagination.insertBefore(li, nextBtn.parentElement);
+      } else if (
+        (i === currentPage - 2 && i > 1) ||
+        (i === currentPage + 2 && i < totalPages)
+      ) {
+        const li = document.createElement("li");
+        li.className = "page-btn flex h-9 w-9 items-center justify-center";
+        li.innerHTML = `
+          <svg class="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none">
+            <circle cx="5" cy="12" r="1.5" fill="currentColor"/>
+            <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+            <circle cx="19" cy="12" r="1.5" fill="currentColor"/>
+          </svg>
+        `;
+        pagination.insertBefore(li, nextBtn.parentElement);
+      }
+    }
+
+    prevBtn.disabled = currentPage === 1;
+    nextBtn.disabled = currentPage === totalPages;
+  }
+
+  function updatePagination() {
+    renderPages();
+  }
+
+  prevBtn.addEventListener("click", () => {
+    if (currentPage > 1) {
+      currentPage--;
+      updatePagination();
+    }
+  });
+
+  nextBtn.addEventListener("click", () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      updatePagination();
+    }
+  });
+
+  // Initial render
+  renderPages();
+</script>
