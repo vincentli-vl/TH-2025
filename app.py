@@ -86,6 +86,26 @@ def loop():
 def voice():
     return render_template('voice.html')
 
+@app.route('/journal')
+def journal():
+    return render_template('journal.html')
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
+
+@app.route('/settings')
+def settings():
+    return render_template('settings.html')
+
+@app.route('/profile')
+def profile():
+    return render_template('profile.html')
+
+@app.route('/camera')
+def camera():
+    return render_template('camera.html')
+
 @app.route('/transcribe', methods=['POST'])
 def transcribe_audio():
     try:
