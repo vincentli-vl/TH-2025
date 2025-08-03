@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
 <div id="camera-app" class="p-6 space-y-6">
-    <!-- Header -->
     <div class="flex justify-between items-center">
       <div>
         <h1 class="text-2xl font-medium text-gray-900">Live Camera Monitor</h1>
@@ -13,14 +12,12 @@
           <span class="text-sm text-gray-500">4 Cameras Online</span>
         </div>
         <button class="border border-gray-300 text-gray-700 px-3 py-1 rounded-sm text-sm flex items-center gap-2">
-          <!-- Settings icon omitted for brevity -->
           Camera Settings
         </button>
       </div>
     </div>
-  
+
     <div class="grid lg:grid-cols-4 gap-6">
-      <!-- Main Camera View -->
       <div class="lg:col-span-3 space-y-4">
         <div class="border rounded-lg overflow-hidden shadow-sm">
           <div class="p-4 flex justify-between items-center">
@@ -96,7 +93,7 @@
             </div>
           </div>
         </div>
-  
+
         <div id="grid-view" class="hidden">
           <div class="border rounded-lg shadow-sm p-4">
             <h3 class="font-semibold mb-2">All Cameras</h3>
@@ -104,8 +101,7 @@
           </div>
         </div>
       </div>
-  
-      <!-- Sidebar -->
+
       <div class="space-y-6">
         <div class="border rounded-lg shadow-sm p-4">
           <h3 class="flex items-center gap-2 font-semibold">Camera Status</h3>
@@ -116,12 +112,13 @@
           <div id="events-list" class="mt-2 space-y-2"></div>
           <button id="btn-all-events" class="mt-2 w-full p-2 border rounded text-sm">View All Events</button>
         </div>
-        <!-- Emotion Chart Animation -->
+        
         <div class="border rounded-lg shadow-sm p-4">
-          <h3 class="flex items-center gap-2 font-semibold">Emotion Chart (Animated)</h3>
-          <div class="mt-2">
-            <img src="/chart-anim" alt="Animated Emotion Chart" class="w-full rounded">
-          </div>
+            <h3 class="flex items-center gap-2 font-semibold">Live Emotion Analysis</h3>
+            <div class="mt-2 text-center">
+                <canvas id="emotion-chart" width="200" height="200" class="mx-auto"></canvas>
+                <div id="emotion-legend" class="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs"></div>
+            </div>
         </div>
 
         <div class="border rounded-lg shadow-sm p-4">
@@ -145,10 +142,10 @@
         </div>
       </div>
     </div>
-  </div>
-  
-  <script>
-  ;(function(){
+</div>
+
+<script>
+;(function(){
     const cameras = [
       { id: 'living-room', name: 'Living Room', location: 'Main Area', status: 'active', quality: '1080p', hasAudio: true },
       { id: 'bedroom', name: 'Bedroom', location: 'Sleep Area', status: 'active', quality: '720p', hasAudio: false },
@@ -160,12 +157,21 @@
       { time: '1:30 PM', camera: 'Kitchen', event: 'Person recognized: Margaret', type: 'recognition' },
       { time: '12:15 PM', camera: 'Living Room', event: 'Visitor detected: Jake', type: 'visitor' }
     ];
-  
+
+    // NEW: Emotion data for the pie chart
+    let emotions = [
+      { label: 'Happy', value: 25, color: '#22c55e' },     // Tailwind green-500
+      { label: 'Sad', value: 10, color: '#3b82f6' },       // Tailwind blue-500
+      { label: 'Angry', value: 5, color: '#ef4444' },      // Tailwind red-500
+      { label: 'Neutral', value: 50, color: '#6b7280' },   // Tailwind gray-500
+      { label: 'Surprised', value: 10, color: '#eab308' }  // Tailwind yellow-500
+    ];
+
     let isRecording = false;
     let audioEnabled = true;
     let selectedCamera = 'living-room';
     let viewMode = 'single';
-  
+
     const titleEl = document.getElementById('camera-title');
     const title2El = document.getElementById('camera-title2');
     const locEl = document.getElementById('camera-location');
@@ -181,7 +187,12 @@
     const statusList = document.getElementById('status-list');
     const eventsList = document.getElementById('events-list');
     const currentTimeEl = document.getElementById('current-time');
-  
+    
+    // NEW: Canvas elements
+    const emotionCanvas = document.getElementById('emotion-chart');
+    const emotionLegend = document.getElementById('emotion-legend');
+    const ctx = emotionCanvas.getContext('2d');
+
     function updateHeader(){
       const cam = cameras.find(c=>c.id===selectedCamera);
       titleEl.textContent = cam.name + ' Camera';
@@ -191,16 +202,17 @@
       statusEl.className = cam.status==='active' ? 'px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs' : 'px-2 py-0.5 bg-red-100 text-red-800 rounded text-xs';
       qualEl.textContent = cam.quality;
     }
-  
+
     function updateRecord(){
       labelRecord.textContent = isRecording ? 'Stop Recording' : 'Start Recording';
       btnRecord.classList.toggle('bg-red-600', isRecording);
+      btnRecord.classList.toggle('text-white', isRecording);
     }
-  
+
     function updateAudio(){
       btnAudio.textContent = audioEnabled ? '🔊' : '🔇';
     }
-  
+
     function updateGrid(){
       gridView.classList.toggle('hidden', viewMode !== 'grid');
       gridContainer.innerHTML = '';
@@ -218,7 +230,34 @@
         });
       }
     }
-  
+    
+    // NEW: Function to draw and update the pie chart and its legend
+    function updateEmotionChart() {
+        const total = emotions.reduce((sum, e) => sum + e.value, 0);
+        let currentAngle = -0.5 * Math.PI; // Start at the top for a cleaner look
+        
+        ctx.clearRect(0, 0, emotionCanvas.width, emotionCanvas.height);
+        emotionLegend.innerHTML = '';
+
+        emotions.forEach(emotion => {
+            // 1. Draw the pie slice
+            const sliceAngle = (emotion.value / total) * 2 * Math.PI;
+            ctx.beginPath();
+            ctx.arc(100, 100, 80, currentAngle, currentAngle + sliceAngle); // centerX, centerY, radius, start, end
+            ctx.lineTo(100, 100);
+            ctx.fillStyle = emotion.color;
+            ctx.fill();
+            currentAngle += sliceAngle;
+
+            // 2. Create the legend item
+            const percentage = ((emotion.value / total) * 100).toFixed(1);
+            const legendItem = document.createElement('div');
+            legendItem.className = 'flex items-center gap-2';
+            legendItem.innerHTML = `<div class="w-3 h-3 rounded-sm" style="background-color:${emotion.color}"></div><span class="text-gray-600">${emotion.label}: <strong>${percentage}%</strong></span>`;
+            emotionLegend.appendChild(legendItem);
+        });
+    }
+
     function populateSelects(){
       cameras.forEach(c=>{
         const opt = document.createElement('option');
@@ -227,24 +266,24 @@
       });
       selectCamera.value = selectedCamera;
     }
-  
+
     function populateLists(){
       statusList.innerHTML = '';
       eventsList.innerHTML = '';
       cameras.forEach(c=>{
         const div = document.createElement('div');
-        div.className='flex items-center justify-between p-2 rounded-lg bg-gray-100';
-        div.innerHTML= `<div><p class="text-sm font-medium">${c.name}</p><p class="text-xs text-gray-500">${c.location}</p></div><div class="text-right"><p class="text-xs text-gray-500">${c.quality}</p>${c.hasAudio? ' 🔊':''}</div>`;
+        div.className='flex items-center justify-between p-2 rounded-lg ' + (c.status === 'active' ? 'bg-gray-50' : 'bg-red-50');
+        div.innerHTML= `<div><p class="text-sm font-medium">${c.name}</p><p class="text-xs text-gray-500">${c.location}</p></div><div class="text-right"><span class="text-xs px-2 py-0.5 rounded ${c.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${c.status}</span></div>`;
         statusList.appendChild(div);
       });
       events.forEach(e=>{
         const div = document.createElement('div');
-        div.className='flex items-center gap-3 p-2 rounded-lg bg-gray-100';
+        div.className='flex items-center gap-3 p-2 rounded-lg bg-gray-50';
         div.innerHTML=`<div class="w-2 h-2 rounded-full ${ e.type==='motion'?'bg-yellow-500': e.type==='recognition'?'bg-green-500':'bg-blue-500'}"></div><div class="flex-1"><div class="flex items-center gap-2 mb-1"><span class="text-xs font-medium">${e.time}</span><span class="text-xs text-gray-500">•</span><span class="text-xs text-gray-500">${e.camera}</span></div><p class="text-xs text-gray-900">${e.event}</p></div>`;
         eventsList.appendChild(div);
       });
     }
-  
+
     selectCamera.addEventListener('change', e => {
       selectedCamera = e.target.value;
       updateHeader();
@@ -261,19 +300,31 @@
       audioEnabled = !audioEnabled;
       updateAudio();
     });
-  
+
     setInterval(()=>{
       const now = new Date();
       currentTimeEl.textContent = now.toLocaleTimeString();
     },1000);
 
+    // NEW: Interval to simulate live emotion data changes and redraw the chart
     setInterval(() => {
-      const chartImg = document.querySelector('img[src^="/chart-anim"]');
-      if (chartImg) {
-        chartImg.src = '/chart-anim?ts=' + new Date().getTime(); // bust cache
-      }
-    }, 5000); // Refresh every 5 seconds
-  
+        let totalValue = 0;
+        // Randomly fluctuate emotion values for a dynamic effect
+        emotions.forEach(e => {
+            // Fluctuate the value, but keep it from going below a threshold (e.g., 5)
+            e.value = Math.max(5, e.value + (Math.random() - 0.45) * 5);
+            totalValue += e.value;
+        });
+        
+        // Normalize values back to 100 to prevent wild swings
+        const scale = 100 / totalValue;
+        emotions.forEach(e => {
+            e.value *= scale;
+        });
+
+        updateEmotionChart();
+    }, 100); // Refresh every 2 seconds
+
     // Initialize
     populateSelects();
     populateLists();
@@ -281,6 +332,7 @@
     updateRecord();
     updateAudio();
     updateGrid();
-  })();
-  </script>
+    updateEmotionChart(); // Initial chart draw
+})();
+</script>
 {% endblock %}
