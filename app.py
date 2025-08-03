@@ -82,44 +82,53 @@ def recognize_identity(face_embedding):
     return None
 
 def scan(cam):
+    frame_count = 0
+    analysis_results = []
+    scale_factor = 0.5  # Must match fx, fy in resize
     while True:
         r, f = cam.read()
         if not r:
             continue
 
-        try:
-            analysis = DeepFace.analyze(f, actions=['emotion'], enforce_detection=False)
-            if analysis and isinstance(analysis, list):
-                face = analysis[0]
-                region = face.get('region', {})
-                x, y, w, h = region.get('x', 0), region.get('y', 0), region.get('w', 0), region.get('h', 0)
-                frame_height, frame_width, _ = f.shape
-                is_valid_face = w > 0 and h > 0 and w < frame_width - 1 and h < frame_height - 1
+        frame_count += 1
+        # Only analyze every 10th frame for performance
+        if frame_count % 10 == 0:
+            try:
+                small_f = cv2.resize(f, (0, 0), fx=scale_factor, fy=scale_factor)
+                analysis = DeepFace.analyze(
+                    small_f,
+                    actions=['emotion'],
+                    enforce_detection=False,
+                    detector_backend="opencv"
+                )
+                # DeepFace returns a dict for one face, or a list for multiple
+                if isinstance(analysis, dict):
+                    analysis_results = [analysis]
+                elif isinstance(analysis, list):
+                    analysis_results = analysis
+            except Exception as e:
+                print(f"Face scan error: {e}")
 
-                if is_valid_face:
-                    latest_emotions.update(face.get('emotion', latest_emotions))
-                    dominant_emotion = face.get('dominant_emotion', 'neutral').lower()
-                    conf = latest_emotions.get(dominant_emotion, 0)
-                    percent_text = f"Acc: {conf:.1f}%"
-
-                    emoji_x, emoji_y = x, max(y - emoji_size[1] - 20, 0)
-                    text_y = emoji_y + emoji_size[1] + 5
-
-                    if dominant_emotion in emoji_map:
-                        f = overlay_png_alpha(f, emoji_map[dominant_emotion], emoji_x, emoji_y)
-
-                    identity = None
-                    embedding = DeepFace.represent(f, model_name="Facenet", enforce_detection=False)[0]["embedding"]
-                    identity = recognize_identity(embedding)
-                    name_text = identity if identity else "Unknown"
-
-                    cv2.putText(f, name_text, (x, text_y + 30), cv2.FONT_HERSHEY_SIMPLEX, 1.2, CYAN, 2)
-                    cv2.putText(f, dominant_emotion.capitalize(), (x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1.2, CYAN, 2)
-                    cv2.putText(f, percent_text, (x + w - 100, y + h + 25), cv2.FONT_HERSHEY_SIMPLEX, 0.8, CYAN, 2)
-                    cv2.rectangle(f, (x, y), (x + w, y + h), CYAN, 2)
-
-        except Exception as e:
-            print(f"Face scan error: {e}")
+        # Draw results for all detected faces
+        for face in analysis_results:
+            region = face.get('region', {})
+            # Scale coordinates back to original frame size
+            x = int(region.get('x', 0) / scale_factor)
+            y = int(region.get('y', 0) / scale_factor)
+            w = int(region.get('w', 0) / scale_factor)
+            h = int(region.get('h', 0) / scale_factor)
+            if w > 0 and h > 0:
+                latest_emotions.update(face.get('emotion', latest_emotions))
+                dominant_emotion = face.get('dominant_emotion', 'neutral').lower()
+                conf = latest_emotions.get(dominant_emotion, 0)
+                percent_text = f"Acc: {conf:.1f}%"
+                emoji_x, emoji_y = x, max(y - emoji_size[1] - 20, 0)
+                text_y = emoji_y + emoji_size[1] + 5
+                if dominant_emotion in emoji_map:
+                    f = overlay_png_alpha(f, emoji_map[dominant_emotion], emoji_x, emoji_y)
+                cv2.putText(f, dominant_emotion.capitalize(), (x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1.2, CYAN, 2)
+                cv2.putText(f, percent_text, (x + w - 100, y + h + 25), cv2.FONT_HERSHEY_SIMPLEX, 0.8, CYAN, 2)
+                cv2.rectangle(f, (x, y), (x + w, y + h), CYAN, 2)
 
         ret, buffer = cv2.imencode('.jpg', f)
         if not ret:
