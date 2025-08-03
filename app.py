@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, Response
 import speech_recognition as sr
 import json
 import os
@@ -10,6 +10,7 @@ from deepface import DeepFace
 import matplotlib.pyplot as plt
 import numpy as np
 import time
+from shutil import move
 
 CAM0 = 0
 CAM1 = 1
@@ -36,9 +37,49 @@ except Exception as e:
 
 # =================== ROUTES ===================
 
+cam0 = cv2.VideoCapture(CAM0 + cv2.CAP_DSHOW)
+cam1 = cv2.VideoCapture(CAM1 + cv2.CAP_DSHOW)
+
+def scan(cam):
+    while True:
+        r, f = cam.read()
+        if not r:
+            continue
+
+        try:
+            analysis = DeepFace.analyze(f, actions=['emotion'], enforce_detection=False)
+            if analysis and isinstance(analysis, list):
+                face = analysis[0]
+                region = face.get('region', {})
+                x, y, w, h = region.get('x', 0), region.get('y', 0), region.get('w', 0), region.get('h', 0)
+                frame_height, frame_width, _ = f.shape
+                is_valid_face = w > 0 and h > 0 and w < frame_width - 1 and h < frame_height - 1
+                if is_valid_face:
+                    cv2.rectangle(f, (x, y), (x + w, y + h), (255, 255, 255), 1)
+        except Exception as e:
+            print(f"Face scan error: {e}")
+
+        ret, buffer = cv2.imencode('.jpg', f)
+        if not ret:
+            continue
+
+        frame_bytes = buffer.tobytes()
+        yield (b'--frame\r\n'
+            b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n') 
+
 @app.route('/')
 def home():
     return render_template('index.html')
+
+@app.route('/c0')
+def c0():
+    return Response(scan(cam0),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/c1')
+def c1():
+    return Response(scan(cam0),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/voice')
 def voice():
@@ -91,31 +132,12 @@ def get_history():
 
 # =================== CAMERA LOOP ===================
 
-cam0 = cv2.VideoCapture(CAM0 + cv2.CAP_DSHOW)
-cam1 = cv2.VideoCapture(CAM1 + cv2.CAP_DSHOW)
 
-def scan(out, cam):
-    r, f = cam.read()
-    if not r:
-        return
-    try:
-        analysis = DeepFace.analyze(f, actions=['emotion'], enforce_detection=False)
-        if analysis and isinstance(analysis, list):
-            face = analysis[0]
-            region = face.get('region', {})
-            x, y, w, h = region.get('x', 0), region.get('y', 0), region.get('w', 0), region.get('h', 0)
-            frame_height, frame_width, _ = f.shape
-            is_valid_face = w > 0 and h > 0 and w < frame_width - 1 and h < frame_height - 1
-            if is_valid_face:
-                cv2.rectangle(f, (x, y), (x + w, y + h), (255, 255, 255), 1)
-    except Exception as e:
-        print(f"Face scan error: {e}")
-    cv2.imwrite(f"./{out}", f)
 
-def loop():
-    while True:
-        scan("output0.png", cam0)
-        scan("output1.png", cam1)
+# def loop():
+#     while True:
+#         scan("./static/output0", cam0)
+#         scan("./static/output1", cam1)
 
 # =================== EMOTION TRACKING ADDITION ===================
 
@@ -261,6 +283,6 @@ def save_conversation_to_file():
 
 if __name__ == '__main__':
     print("Starting Flask app...")
-    a = threading.Thread(target=loop, daemon=True)
-    a.start()
+    # a = threading.Thread(target=loop, daemon=True)
+    # a.start()
     app.run(debug=False)
