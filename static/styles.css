@@ -1,5 +1,39 @@
 @custom-variant dark (&:is(.dark *));
 
+<style>
+    /* Existing styles */
+
+    .camera-frame {
+        position: relative; /* Needed for pseudo-element */
+    }
+
+    .camera-frame::before {
+        content: '';
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        bottom: -5px;
+        left: -5px;
+        border: 2px solid cyan; /* Initial cyan border */
+        opacity: 0.8;
+        border-radius: inherit; /* Match the camera frame's border radius */
+        z-index: 10; /* Ensure it's on top of other potential shadows */
+        pointer-events: none; /* Don't interfere with clicks on the video */
+        animation: cyan-glow 2s infinite alternate; /* Apply the animation */
+    }
+
+    @keyframes cyan-glow {
+        0% {
+            box-shadow: 0 0 10px cyan;
+            opacity: 0.8;
+        }
+        100% {
+            box-shadow: 0 0 20px deepskyblue;
+            opacity: 1;
+        }
+    }
+</style>
+
 :root {
   --font-size: 16px;
   --background: #ffffff;

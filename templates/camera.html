@@ -1,5 +1,46 @@
 {% extends "base.html" %}
 {% block content %}
+<style>
+    /* Add a transition effect to the canvas for smoother hover interactions */
+    #emotion-chart {
+        transition: transform 0.2s ease-out;
+    }
+
+    /* Animated Glow Effect Logic */
+    @property --deg {
+      syntax: '<angle>';
+      inherits: true;
+      initial-value: 0deg;
+    }
+
+    .video-glow {
+        position: relative;
+        z-index: 0;
+    }
+
+    .video-glow::before,
+    .video-glow::after {
+        content: '';
+        position: absolute;
+        top: -1px; right: -1px; bottom: -1px; left: -1px;
+        background: conic-gradient(
+            from var(--deg) at center,
+            #00c3ff, #4d0199, #6300c6, #009dcd, #00c3ff
+        );
+        border-radius: inherit;
+        z-index: -1;
+        animation: autoRotate 4s linear infinite;
+    }
+
+    .video-glow::before {
+        filter: blur(5px);
+        opacity: 0.93;
+    }
+
+    @keyframes autoRotate {
+        to { --deg: 360deg; }
+    }
+</style>
 <div id="camera-app" class="p-6 space-y-6">
     <div class="flex justify-between items-center">
       <div>
@@ -9,8 +50,11 @@
       <div class="flex items-center gap-4">
         <div class="flex items-center gap-2">
           <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-          <span class="text-sm text-gray-500">4 Cameras Online</span>
+          <span class="text-sm text-gray-500">2 Cameras Online</span>
         </div>
+        <button id="btn-toggle-view" class="border border-gray-300 text-gray-700 px-3 py-1 rounded-sm text-sm">
+            Grid View
+        </button>
         <button class="border border-gray-300 text-gray-700 px-3 py-1 rounded-sm text-sm flex items-center gap-2">
           Camera Settings
         </button>
@@ -19,79 +63,73 @@
 
     <div class="grid lg:grid-cols-4 gap-6">
       <div class="lg:col-span-3 space-y-4">
-        <div class="border rounded-lg overflow-hidden shadow-sm">
-          <div class="p-4 flex justify-between items-center">
-            <div>
-              <h2 id="camera-title" class="flex items-center gap-2 text-lg font-semibold">Living Room Camera</h2>
-              <div class="flex items-center gap-4 mt-1 text-sm text-gray-500">
-                <span id="camera-location">Main Area</span>
-                <span id="camera-status" class="px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs">active</span>
-                <span id="camera-quality">1080p</span>
+        <div id="single-view-container">
+            <div class="border rounded-lg shadow-sm">
+              <div class="p-4 flex justify-between items-center">
+                <div>
+                  <h2 id="camera-title" class="flex items-center gap-2 text-lg font-semibold">Living Room Camera</h2>
+                  <div class="flex items-center gap-4 mt-1 text-sm text-gray-500">
+                    <span id="camera-location">Main Area</span>
+                    <span id="camera-status" class="px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs">active</span>
+                    <span id="camera-quality">1080p</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button class="p-1 hover:bg-gray-100 rounded">🔍–</button>
+                  <button class="p-1 hover:bg-gray-100 rounded">🔍+</button>
+                  <button class="p-1 hover:bg-gray-100 rounded">↔️</button>
+                  <button class="p-1 hover:bg-gray-100 rounded">⛶</button>
+                </div>
+              </div>
+              <div class="video-glow relative aspect-video bg-gray-900 rounded-b-lg">
+                <img id="main-camera-feed" src="/c0" class="absolute inset-0 w-full h-full object-cover z-0 rounded-b-lg" />
+                <div class="absolute inset-0 flex items-center justify-center text-white opacity-75 text-center">
+                  <div>
+                    <p class="text-lg font-medium">Live Camera Feed</p>
+                    <p class="text-sm">Streaming from <span id="camera-title2">Living Room</span></p>
+                  </div>
+                </div>
+                <div class="absolute top-4 left-4 flex items-center gap-2">
+                  <span class="bg-red-600 text-white px-2 py-0.5 text-xs rounded flex items-center gap-1">
+                    <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                    LIVE
+                  </span>
+                  <span class="bg-black/50 text-white border border-white/20 px-2 py-0.5 text-xs rounded">
+                    <span id="current-time">--:--:--</span>
+                  </span>
+                </div>
+                <div class="absolute bottom-4 left-4 right-4 flex justify-between items-center">
+                  <div class="flex items-center gap-2">
+                    <button id="btn-record" class="text-sm px-3 py-1 border rounded flex items-center gap-1">
+                      <span id="label-record">Start Recording</span>
+                    </button>
+                    <button id="btn-capture" class="text-sm px-3 py-1 border rounded flex items-center gap-1">Capture</button>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button id="btn-audio" class="p-1 border rounded">🔊</button>
+                    <button id="btn-maximize" class="p-1 border rounded">⛶</button>
+                  </div>
+                </div>
+              </div>
+              <div class="flex justify-between items-center p-4 border-t">
+                <div class="flex items-center gap-4">
+                  <label class="flex items-center gap-2">
+                    <span>Camera:</span>
+                    <select id="select-camera" class="border rounded p-1"></select>
+                  </label>
+                  </div>
+                <div class="flex items-center gap-4">
+                  <label class="flex items-center gap-2">
+                    <input type="checkbox" id="motion-detection" checked />
+                    Motion Detection
+                  </label>
+                  <label class="flex items-center gap-2">
+                    <input type="checkbox" id="night-vision" checked />
+                    Night Vision
+                  </label>
+                </div>
               </div>
             </div>
-            <div class="flex items-center gap-2">
-              <button class="p-1 hover:bg-gray-100 rounded">🔍–</button>
-              <button class="p-1 hover:bg-gray-100 rounded">🔍+</button>
-              <button class="p-1 hover:bg-gray-100 rounded">↔️</button>
-              <button class="p-1 hover:bg-gray-100 rounded">⛶</button>
-            </div>
-          </div>
-          <div class="relative aspect-video bg-gray-900 rounded-b-lg overflow-hidden">
-            <img src="/c0" class="absolute inset-0 w-full h-full object-cover z-0" />
-            <div class="absolute inset-0 flex items-center justify-center text-white opacity-75 text-center">
-              <div>
-                <p class="text-lg font-medium">Live Camera Feed</p>
-                <p class="text-sm">Streaming from <span id="camera-title2">Living Room</span></p>
-              </div>
-            </div>
-            <div class="absolute top-4 left-4 flex items-center gap-2">
-              <span class="bg-red-600 text-white px-2 py-0.5 text-xs rounded flex items-center gap-1">
-                <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-                LIVE
-              </span>
-              <span class="bg-black/50 text-white border border-white/20 px-2 py-0.5 text-xs rounded">
-                <span id="current-time">--:--:--</span>
-              </span>
-            </div>
-            <div class="absolute bottom-4 left-4 right-4 flex justify-between items-center">
-              <div class="flex items-center gap-2">
-                <button id="btn-record" class="text-sm px-3 py-1 border rounded flex items-center gap-1">
-                  <span id="label-record">Start Recording</span>
-                </button>
-                <button id="btn-capture" class="text-sm px-3 py-1 border rounded flex items-center gap-1">Capture</button>
-              </div>
-              <div class="flex items-center gap-2">
-                <button id="btn-audio" class="p-1 border rounded">🔊</button>
-                <button id="btn-maximize" class="p-1 border rounded">⛶</button>
-              </div>
-            </div>
-          </div>
-          <div class="flex justify-between items-center p-4 border-t">
-            <div class="flex items-center gap-4">
-              <label class="flex items-center gap-2">
-                <span>Camera:</span>
-                <select id="select-camera" class="border rounded p-1"></select>
-              </label>
-              <label class="flex items-center gap-2">
-                <span>View:</span>
-                <select id="select-viewmode" class="border rounded p-1">
-                  <option value="single">Single</option>
-                  <option value="grid">Grid</option>
-                  <option value="pip">Picture‑in‑Picture</option>
-                </select>
-              </label>
-            </div>
-            <div class="flex items-center gap-4">
-              <label class="flex items-center gap-2">
-                <input type="checkbox" id="motion-detection" checked />
-                Motion Detection
-              </label>
-              <label class="flex items-center gap-2">
-                <input type="checkbox" id="night-vision" checked />
-                Night Vision
-              </label>
-            </div>
-          </div>
         </div>
 
         <div id="grid-view" class="hidden">
@@ -107,18 +145,19 @@
           <h3 class="flex items-center gap-2 font-semibold">Camera Status</h3>
           <div id="status-list" class="mt-2 space-y-2"></div>
         </div>
-        <div class="border rounded-lg shadow-sm p-4">
-          <h3 class="flex items-center gap-2 font-semibold">Recent Events</h3>
-          <div id="events-list" class="mt-2 space-y-2"></div>
-          <button id="btn-all-events" class="mt-2 w-full p-2 border rounded text-sm">View All Events</button>
-        </div>
-        
+
         <div class="border rounded-lg shadow-sm p-4">
             <h3 class="flex items-center gap-2 font-semibold">Live Emotion Analysis</h3>
             <div class="mt-2 text-center">
                 <canvas id="emotion-chart" width="200" height="200" class="mx-auto"></canvas>
                 <div id="emotion-legend" class="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs"></div>
             </div>
+        </div>
+        
+        <div class="border rounded-lg shadow-sm p-4">
+          <h3 class="flex items-center gap-2 font-semibold">Recent Events</h3>
+          <div id="events-list" class="mt-2 space-y-2"></div>
+          <button id="btn-all-events" class="mt-2 w-full p-2 border rounded text-sm">View All Events</button>
         </div>
 
         <div class="border rounded-lg shadow-sm p-4">
@@ -158,19 +197,10 @@
       { time: '12:15 PM', camera: 'Living Room', event: 'Visitor detected: Jake', type: 'visitor' }
     ];
 
-    // NEW: Emotion data for the pie chart
-    let emotions = [
-      { label: 'Happy', value: 25, color: '#22c55e' },     // Tailwind green-500
-      { label: 'Sad', value: 10, color: '#3b82f6' },       // Tailwind blue-500
-      { label: 'Angry', value: 5, color: '#ef4444' },      // Tailwind red-500
-      { label: 'Neutral', value: 50, color: '#6b7280' },   // Tailwind gray-500
-      { label: 'Surprised', value: 10, color: '#eab308' }  // Tailwind yellow-500
-    ];
-
     let isRecording = false;
     let audioEnabled = true;
     let selectedCamera = 'living-room';
-    let viewMode = 'single';
+    let viewMode = 'single'; // Default view is always single
 
     const titleEl = document.getElementById('camera-title');
     const title2El = document.getElementById('camera-title2');
@@ -181,18 +211,94 @@
     const labelRecord = document.getElementById('label-record');
     const btnAudio = document.getElementById('btn-audio');
     const selectCamera = document.getElementById('select-camera');
-    const selectView = document.getElementById('select-viewmode');
+    const singleViewContainer = document.getElementById('single-view-container');
     const gridView = document.getElementById('grid-view');
     const gridContainer = document.getElementById('grid-container');
     const statusList = document.getElementById('status-list');
     const eventsList = document.getElementById('events-list');
     const currentTimeEl = document.getElementById('current-time');
-    
-    // NEW: Canvas elements
+    const mainCameraFeed = document.getElementById('main-camera-feed');
     const emotionCanvas = document.getElementById('emotion-chart');
     const emotionLegend = document.getElementById('emotion-legend');
     const ctx = emotionCanvas.getContext('2d');
+    const btnToggleView = document.getElementById('btn-toggle-view'); // Get the new button
 
+    // Chart logic remains the same
+    let chartState = [];
+    let hoveredSliceIndex = -1;
+    const emotionColorMap = {
+        happy: '#22c55e', sad: '#3b82f6', angry: '#ef4444',
+        neutral: '#6b7280', surprised: '#eab308', fear: '#8b5cf6', disgust: '#78716c'
+    };
+    function drawEmotionChart() {
+        ctx.clearRect(0, 0, emotionCanvas.width, emotionCanvas.height);
+        const centerX = emotionCanvas.width / 2;
+        const centerY = emotionCanvas.height / 2;
+        let startAngle = -0.5 * Math.PI;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+        ctx.shadowBlur = 5;
+        ctx.shadowOffsetY = 2;
+        chartState.forEach((slice, index) => {
+            const radius = index === hoveredSliceIndex ? 85 : 80;
+            const endAngle = startAngle + slice.currentAngle;
+            ctx.beginPath();
+            ctx.fillStyle = slice.color;
+            ctx.moveTo(centerX, centerY);
+            ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+            ctx.closePath();
+            ctx.fill();
+            startAngle = endAngle;
+        });
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetY = 0;
+        ctx.beginPath();
+        ctx.fillStyle = 'white';
+        ctx.arc(centerX, centerY, 40, 0, 2 * Math.PI);
+        ctx.fill();
+    }
+    function animateChart() {
+        let animationComplete = true;
+        chartState.forEach(slice => {
+            const diff = slice.targetAngle - slice.currentAngle;
+            if (Math.abs(diff) > 0.0001) {
+                animationComplete = false;
+                slice.currentAngle += diff * 0.1;
+            } else {
+                slice.currentAngle = slice.targetAngle;
+            }
+        });
+        drawEmotionChart();
+        if (!animationComplete) {
+            requestAnimationFrame(animateChart);
+        }
+    }
+    async function updateEmotionData() {
+        try {
+            const response = await fetch("/api/emotions");
+            const em = await response.json();
+            const total = Object.values(em).reduce((sum, value) => sum + value, 0);
+            emotionLegend.innerHTML = '';
+            const newSliceData = Object.entries(em).map(([name, value]) => {
+                const percentage = total > 0 ? (value / total * 100).toFixed(1) : 0;
+                const legendItem = document.createElement('div');
+                legendItem.className = 'flex items-center gap-2';
+                const color = emotionColorMap[name.toLowerCase()] || '#cccccc';
+                legendItem.innerHTML = `<div class="w-3 h-3 rounded-sm" style="background-color:${color}"></div><span class="text-gray-600">${name}: <strong>${percentage}%</strong></span>`;
+                emotionLegend.appendChild(legendItem);
+                return { name, value, color, targetAngle: total > 0 ? (value / total) * 2 * Math.PI : 0 };
+            });
+            if (chartState.length === 0) {
+                chartState = newSliceData.map(s => ({ ...s, currentAngle: s.targetAngle }));
+            } else {
+                chartState.forEach((s, i) => { s.targetAngle = newSliceData[i]?.targetAngle || 0; });
+            }
+            requestAnimationFrame(animateChart);
+        } catch (error) {
+            console.error("Error updating emotion data:", error);
+        }
+    }
+
+    // Other functions remain the same
     function updateHeader(){
       const cam = cameras.find(c=>c.id===selectedCamera);
       titleEl.textContent = cam.name + ' Camera';
@@ -202,62 +308,28 @@
       statusEl.className = cam.status==='active' ? 'px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs' : 'px-2 py-0.5 bg-red-100 text-red-800 rounded text-xs';
       qualEl.textContent = cam.quality;
     }
-
     function updateRecord(){
       labelRecord.textContent = isRecording ? 'Stop Recording' : 'Start Recording';
       btnRecord.classList.toggle('bg-red-600', isRecording);
       btnRecord.classList.toggle('text-white', isRecording);
     }
-
     function updateAudio(){
       btnAudio.textContent = audioEnabled ? '🔊' : '🔇';
     }
-
     function updateGrid(){
-      gridView.classList.toggle('hidden', viewMode !== 'grid');
+      const isGridView = viewMode === 'grid';
+      gridView.classList.toggle('hidden', !isGridView);
+      singleViewContainer.classList.toggle('hidden', isGridView);
       gridContainer.innerHTML = '';
-      if (viewMode === 'grid'){
-        cameras.forEach(c=>{
+      if (isGridView){
+        cameras.forEach((c, index) => {
           const div = document.createElement('div');
-          div.className = 'relative';
-          div.innerHTML = `
-            <div class="aspect-video bg-gray-900 rounded-lg flex items-center justify-center text-white opacity-75">
-              <div class="text-center">
-                <p>${c.name}</p>
-              </div>
-            </div>`;
+          div.className = 'relative aspect-video bg-gray-900 rounded-lg overflow-hidden shadow-sm';
+          div.innerHTML = `<img src="/c${index}" class="absolute inset-0 w-full h-full object-cover z-0" alt="${c.name} Feed"><div class="absolute bottom-0 left-0 right-0 p-2 bg-black/50 text-white text-sm font-medium">${c.name}</div>`;
           gridContainer.appendChild(div);
         });
       }
     }
-    
-    // NEW: Function to draw and update the pie chart and its legend
-    function updateEmotionChart() {
-        const total = emotions.reduce((sum, e) => sum + e.value, 0);
-        let currentAngle = -0.5 * Math.PI; // Start at the top for a cleaner look
-        
-        ctx.clearRect(0, 0, emotionCanvas.width, emotionCanvas.height);
-        emotionLegend.innerHTML = '';
-
-        emotions.forEach(emotion => {
-            // 1. Draw the pie slice
-            const sliceAngle = (emotion.value / total) * 2 * Math.PI;
-            ctx.beginPath();
-            ctx.arc(100, 100, 80, currentAngle, currentAngle + sliceAngle); // centerX, centerY, radius, start, end
-            ctx.lineTo(100, 100);
-            ctx.fillStyle = emotion.color;
-            ctx.fill();
-            currentAngle += sliceAngle;
-
-            // 2. Create the legend item
-            const percentage = ((emotion.value / total) * 100).toFixed(1);
-            const legendItem = document.createElement('div');
-            legendItem.className = 'flex items-center gap-2';
-            legendItem.innerHTML = `<div class="w-3 h-3 rounded-sm" style="background-color:${emotion.color}"></div><span class="text-gray-600">${emotion.label}: <strong>${percentage}%</strong></span>`;
-            emotionLegend.appendChild(legendItem);
-        });
-    }
-
     function populateSelects(){
       cameras.forEach(c=>{
         const opt = document.createElement('option');
@@ -266,14 +338,24 @@
       });
       selectCamera.value = selectedCamera;
     }
-
     function populateLists(){
       statusList.innerHTML = '';
       eventsList.innerHTML = '';
-      cameras.forEach(c=>{
+      cameras.forEach((c, index) => {
         const div = document.createElement('div');
-        div.className='flex items-center justify-between p-2 rounded-lg ' + (c.status === 'active' ? 'bg-gray-50' : 'bg-red-50');
+        div.className='flex items-center justify-between p-2 rounded-lg cursor-pointer ' + (c.status === 'active' ? 'bg-gray-50 hover:bg-gray-100' : 'bg-red-50 hover:bg-red-100');
+        div.dataset.cameraId = c.id;
         div.innerHTML= `<div><p class="text-sm font-medium">${c.name}</p><p class="text-xs text-gray-500">${c.location}</p></div><div class="text-right"><span class="text-xs px-2 py-0.5 rounded ${c.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">${c.status}</span></div>`;
+        div.addEventListener('click', () => {
+            const camId = div.dataset.cameraId;
+            const camIndex = cameras.findIndex(cam => cam.id === camId);
+            if (camIndex !== -1) {
+                mainCameraFeed.src = `/c${camIndex}`;
+                selectedCamera = camId;
+                updateHeader();
+                selectCamera.value = camId;
+            }
+        });
         statusList.appendChild(div);
       });
       events.forEach(e=>{
@@ -284,46 +366,50 @@
       });
     }
 
+    // Event Listeners
     selectCamera.addEventListener('change', e => {
-      selectedCamera = e.target.value;
-      updateHeader();
-    });
-    selectView.addEventListener('change', e => {
-      viewMode = e.target.value;
-      updateGrid();
-    });
-    btnRecord.addEventListener('click', () => {
-      isRecording = !isRecording;
-      updateRecord();
-    });
-    btnAudio.addEventListener('click', () => {
-      audioEnabled = !audioEnabled;
-      updateAudio();
+        selectedCamera = e.target.value;
+        const camIndex = cameras.findIndex(c => c.id === selectedCamera);
+        if (camIndex !== -1) {
+            mainCameraFeed.src = `/c${camIndex}`;
+            updateHeader();
+        }
     });
 
+    // MODIFIED: New listener for the toggle button
+    btnToggleView.addEventListener('click', () => {
+        viewMode = (viewMode === 'single') ? 'grid' : 'single';
+        btnToggleView.textContent = (viewMode === 'single') ? 'Grid View' : 'Single View';
+        updateGrid();
+    });
+
+    btnRecord.addEventListener('click', () => { isRecording = !isRecording; updateRecord(); });
+    btnAudio.addEventListener('click', () => { audioEnabled = !audioEnabled; updateAudio(); });
+    emotionCanvas.addEventListener('mousemove', (e) => {
+        const rect = emotionCanvas.getBoundingClientRect();
+        const x = e.clientX - rect.left, y = e.clientY - rect.top;
+        const centerX = emotionCanvas.width / 2, centerY = emotionCanvas.height / 2;
+        const dist = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
+        let angle = Math.atan2(y - centerY, x - centerX);
+        if (angle < -0.5 * Math.PI) angle += 2 * Math.PI;
+        let startAngle = -0.5 * Math.PI, foundIndex = -1;
+        if (dist < 85 && dist > 40) {
+            for(let i=0; i<chartState.length; i++) {
+                const endAngle = startAngle + chartState[i].currentAngle;
+                if(angle >= startAngle && angle <= endAngle) { foundIndex = i; break; }
+                startAngle = endAngle;
+            }
+        }
+        if(hoveredSliceIndex !== foundIndex) { hoveredSliceIndex = foundIndex; drawEmotionChart(); }
+    });
+    emotionCanvas.addEventListener('mouseleave', () => { hoveredSliceIndex = -1; drawEmotionChart(); });
+
+    // Timers
     setInterval(()=>{
       const now = new Date();
       currentTimeEl.textContent = now.toLocaleTimeString();
-    },1000);
-
-    // NEW: Interval to simulate live emotion data changes and redraw the chart
-    setInterval(() => {
-        let totalValue = 0;
-        // Randomly fluctuate emotion values for a dynamic effect
-        emotions.forEach(e => {
-            // Fluctuate the value, but keep it from going below a threshold (e.g., 5)
-            e.value = Math.max(5, e.value + (Math.random() - 0.45) * 5);
-            totalValue += e.value;
-        });
-        
-        // Normalize values back to 100 to prevent wild swings
-        const scale = 100 / totalValue;
-        emotions.forEach(e => {
-            e.value *= scale;
-        });
-
-        updateEmotionChart();
-    }, 100); // Refresh every 2 seconds
+    }, 1000);
+    setInterval(updateEmotionData, 2000);
 
     // Initialize
     populateSelects();
@@ -332,7 +418,7 @@
     updateRecord();
     updateAudio();
     updateGrid();
-    updateEmotionChart(); // Initial chart draw
+    updateEmotionData();
 })();
 </script>
 {% endblock %}

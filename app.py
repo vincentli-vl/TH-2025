@@ -149,6 +149,7 @@ def scan(cam):
             continue
 
         frame_bytes = buffer.tobytes()
+            
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n') 
 
@@ -156,6 +157,11 @@ def scan(cam):
 @app.route('/')
 def home():
     return render_template('index.html')
+
+@app.route('/api/emotions')
+def get_emotions():
+    rounded_emotions = {k: float(v) for k, v in latest_emotions.items()}
+    return jsonify(rounded_emotions)
 
 @app.route('/c0')
 def c0():
