@@ -217,10 +217,36 @@ def transcribe_audio():
 def get_history():
     return jsonify(conversation_history)
 
+
 @app.route('/static/audio/<filename>')
 def serve_audio(filename):
     from flask import send_from_directory
     return send_from_directory('static/audio', filename)
+
+@app.route('/chart')
+def chart():
+    import io
+    from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+
+    fig, ax = plt.subplots(figsize=(3, 3))
+    values = list(latest_emotions.values())
+    labels = list(latest_emotions.keys())
+    total = sum(values)
+
+    if total == 0:
+        values = [1]
+        labels = ['None']
+
+    colors = ['#D7263D', '#8B5E3C', '#5D50A0', '#FFD700', '#2E86AB', '#FF6B35', "#219B7C"]
+    ax.pie(values, labels=labels, colors=colors[:len(values)], autopct='%1.1f%%', startangle=90)
+    ax.axis('equal')
+
+    canvas = FigureCanvas(fig)
+    output = io.BytesIO()
+    canvas.print_png(output)
+    plt.close(fig)
+
+    return Response(output.getvalue(), mimetype='image/png')
 
 # Utilities
 def generate_response(user_input):
