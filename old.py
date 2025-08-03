@@ -7,20 +7,25 @@ import pyttsx3
 import threading
 import cv2
 from deepface import DeepFace
+import matplotlib.pyplot as plt
 import numpy as np
 import time
+from shutil import move
 
 CAM0 = 0
 CAM1 = 1
 app = Flask(__name__)
 
-# Setup
+# =================== Setup ===================
+
 recognizer = sr.Recognizer()
 conversation_history = []
 conversations_folder = "conversations"
+
 if not os.path.exists(conversations_folder):
     os.makedirs(conversations_folder)
 
+# Text-to-Speech
 try:
     tts_engine = pyttsx3.init()
     tts_engine.setProperty('rate', 150)
@@ -30,56 +35,10 @@ except Exception as e:
     print(f"Text-to-speech not available: {e}")
     tts_available = False
 
+# =================== ROUTES ===================
+
 cam0 = cv2.VideoCapture(CAM0 + cv2.CAP_DSHOW)
 cam1 = cv2.VideoCapture(CAM1 + cv2.CAP_DSHOW)
-
-# Reference embeddings
-reference_embeddings = {
-    "Sayeed": [],
-    "Vivian": []
-}
-for img_name in ["sayeed.jpg", "sayeed2.jpg"]:
-    embedding = DeepFace.represent(img_path=img_name, model_name="Facenet", enforce_detection=False)[0]["embedding"]
-    reference_embeddings["Sayeed"].append(embedding)
-
-for img_name in ["vivian.jpg", "vivian2.jpg"]:
-    embedding = DeepFace.represent(img_path=img_name, model_name="Facenet", enforce_detection=False)[0]["embedding"]
-    reference_embeddings["Vivian"].append(embedding)
-
-# Emotion data
-latest_emotions = {'angry': 0, 'disgust': 0, 'fear': 0, 'happy': 0, 'sad': 0, 'surprise': 0, 'neutral': 0}
-emoji_dir = "emojis"
-emoji_map = {}
-emoji_size = (80, 80)
-CYAN = (255, 255, 0)
-
-for emo in latest_emotions.keys():
-    path = os.path.join(emoji_dir, f"{emo}.png")
-    if os.path.exists(path):
-        emoji_img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
-        if emoji_img is not None:
-            emoji_img = cv2.resize(emoji_img, emoji_size)
-            emoji_map[emo] = emoji_img
-
-def overlay_png_alpha(img, png_img, x, y):
-    h, w = png_img.shape[:2]
-    if y + h > img.shape[0] or x + w > img.shape[1] or x < 0 or y < 0:
-        return img
-    png_rgb = png_img[:, :, :3]
-    alpha = png_img[:, :, 3] / 255.0
-    roi = img[y:y+h, x:x+w]
-    for c in range(3):
-        roi[:, :, c] = roi[:, :, c] * (1 - alpha) + png_rgb[:, :, c] * alpha
-    img[y:y+h, x:x+w] = roi
-    return img
-
-def recognize_identity(face_embedding):
-    for name, embeddings in reference_embeddings.items():
-        for ref_emb in embeddings:
-            dist = np.linalg.norm(np.array(ref_emb) - np.array(face_embedding))
-            if dist < 10:  # threshold
-                return name
-    return None
 
 def scan(cam):
     while True:
@@ -93,31 +52,10 @@ def scan(cam):
                 face = analysis[0]
                 region = face.get('region', {})
                 x, y, w, h = region.get('x', 0), region.get('y', 0), region.get('w', 0), region.get('h', 0)
-                frame_height, frame_width, _ = face.shape
+                frame_height, frame_width, _ = f.shape
                 is_valid_face = w > 0 and h > 0 and w < frame_width - 1 and h < frame_height - 1
-
                 if is_valid_face:
-                    latest_emotions.update(face.get('emotion', latest_emotions))
-                    dominant_emotion = face.get('dominant_emotion', 'neutral').lower()
-                    conf = latest_emotions.get(dominant_emotion, 0)
-                    percent_text = f"Acc: {conf:.1f}%"
-
-                    # emoji_x, emoji_y = x, max(y - emoji_size[1] - 20, 0)
-                    # text_y = emoji_y + emoji_size[1] + 5
-
-                    if dominant_emotion in emoji_map:
-                        f = overlay_png_alpha(f, emoji_map[dominant_emotion], emoji_x, emoji_y)
-
-                    identity = None
-                    embedding = DeepFace.represent(f, model_name="Facenet", enforce_detection=False)[0]["embedding"]
-                    identity = recognize_identity(embedding)
-                    name_text = identity if identity else "Unknown"
-
-                    cv2.putText(f, name_text, (x, text_y + 30), cv2.FONT_HERSHEY_SIMPLEX, 1.2, CYAN, 2)
-                    cv2.putText(f, dominant_emotion.capitalize(), (x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1.2, CYAN, 2)
-                    cv2.putText(f, percent_text, (x + w - 100, y + h + 25), cv2.FONT_HERSHEY_SIMPLEX, 0.8, CYAN, 2)
-                    cv2.rectangle(f, (x, y), (x + w, y + h), CYAN, 2)
-
+                    cv2.rectangle(f, (x, y), (x + w, y + h), (255, 255, 255), 1)
         except Exception as e:
             print(f"Face scan error: {e}")
 
@@ -127,9 +65,8 @@ def scan(cam):
 
         frame_bytes = buffer.tobytes()
         yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n') 
+            b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n') 
 
-# Routes
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -141,7 +78,7 @@ def c0():
 
 @app.route('/c1')
 def c1():
-    return Response(scan(cam1),
+    return Response(scan(cam0),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 @app.route('/voice')
@@ -185,6 +122,7 @@ def transcribe_audio():
             threading.Thread(target=play_audio_response, args=(response,), daemon=True).start()
 
         return jsonify({'transcription': text, 'response': response, 'success': True})
+
     except Exception as e:
         return jsonify({'error': f'Error processing transcription: {e}'}), 500
 
@@ -192,7 +130,119 @@ def transcribe_audio():
 def get_history():
     return jsonify(conversation_history)
 
-# Utilities
+# =================== CAMERA LOOP ===================
+
+
+
+# def loop():
+#     while True:
+#         scan("./static/output0", cam0)
+#         scan("./static/output1", cam1)
+
+# =================== EMOTION TRACKING ADDITION ===================
+
+latest_emotions = {'angry': 0, 'disgust': 0, 'fear': 0, 'happy': 0, 'sad': 0, 'surprise': 0, 'neutral': 0}
+emoji_dir = "emojis"
+emoji_map = {}
+emoji_size = (80, 80)
+emotion_tracker_active = False
+
+for emo in latest_emotions.keys():
+    path = os.path.join(emoji_dir, f"{emo}.png")
+    if os.path.exists(path):
+        emoji_img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
+        if emoji_img is not None:
+            emoji_img = cv2.resize(emoji_img, emoji_size)
+            emoji_map[emo] = emoji_img
+
+CYAN = (255, 255, 0)
+
+def overlay_png_alpha(img, png_img, x, y):
+    h, w = png_img.shape[:2]
+    if y + h > img.shape[0] or x + w > img.shape[1] or x < 0 or y < 0:
+        return img
+    png_rgb = png_img[:, :, :3]
+    alpha = png_img[:, :, 3] / 255.0
+    roi = img[y:y+h, x:x+w]
+    for c in range(3):
+        roi[:, :, c] = roi[:, :, c] * (1 - alpha) + png_rgb[:, :, c] * alpha
+    img[y:y+h, x:x+w] = roi
+    return img
+
+def emotion_plotter():
+    plt.ion()
+    fig, ax = plt.subplots(figsize=(7, 4))
+    bars = ax.bar(latest_emotions.keys(), latest_emotions.values(), color='skyblue')
+    ax.set_ylim(0, 100)
+    ax.set_ylabel("Confidence (%)")
+    ax.set_title("Real-Time Emotion Confidence")
+    plt.show(block=False)
+    while emotion_tracker_active:
+        for bar, key in zip(bars, latest_emotions.keys()):
+            bar.set_height(latest_emotions[key])
+        fig.canvas.draw()
+        fig.canvas.flush_events()
+        time.sleep(0.1)
+    plt.ioff()
+    plt.close()
+
+def emotion_tracker():
+    global emotion_tracker_active
+    cap = cam0
+    if not cap.isOpened():
+        print("Webcam not found.")
+        return
+    plot_thread = threading.Thread(target=emotion_plotter)
+    plot_thread.start()
+    cv2.namedWindow("Facial Tracker", cv2.WINDOW_NORMAL)
+    while emotion_tracker_active:
+        ret, frame = cap.read()
+        if not ret:
+            break
+        frame = cv2.resize(frame, (960, 720))
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        analysis = DeepFace.analyze(frame_rgb, actions=['emotion'], enforce_detection=False)
+        if analysis and isinstance(analysis, list):
+            face = analysis[0]
+            region = face.get('region', {})
+            x, y, w, h = region.get('x', 0), region.get('y', 0), region.get('w', 0), region.get('h', 0)
+            if w > 0 and h > 0:
+                latest_emotions.update(face.get('emotion', latest_emotions))
+                dominant_emotion = face.get('dominant_emotion', 'neutral').lower()
+                conf = latest_emotions.get(dominant_emotion, 0)
+                percent_text = f"Acc: {conf:.1f}%"
+                emoji_x, emoji_y = x, max(y - emoji_size[1] - 20, 0)
+                text_y = emoji_y + emoji_size[1] + 5
+                if dominant_emotion in emoji_map:
+                    frame = overlay_png_alpha(frame, emoji_map[dominant_emotion], emoji_x, emoji_y)
+                cv2.putText(frame, dominant_emotion.capitalize(), (x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1.2, CYAN, 2)
+                cv2.putText(frame, percent_text, (x + w - 100, y + h + 25), cv2.FONT_HERSHEY_SIMPLEX, 0.8, CYAN, 2)
+                cv2.rectangle(frame, (x, y), (x + w, y + h), CYAN, 2)
+        cv2.imshow("Facial Tracker", frame)
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord('q'):
+            emotion_tracker_active = False
+            break
+    cap.release()
+    cv2.destroyAllWindows()
+    plot_thread.join()
+
+@app.route('/start_emotion_tracker')
+def start_emotion_tracker():
+    global emotion_tracker_active
+    if not emotion_tracker_active:
+        emotion_tracker_active = True
+        threading.Thread(target=emotion_tracker, daemon=True).start()
+    return "Emotion Tracker Started"
+
+@app.route('/stop_emotion_tracker')
+def stop_emotion_tracker():
+    global emotion_tracker_active
+    emotion_tracker_active = False
+    return "Emotion Tracker Stopped"
+
+# =================== UTILITIES ===================
+
 def generate_response(user_input):
     lower = user_input.lower()
     if 'hello' in lower or 'hi' in lower:
@@ -229,6 +279,10 @@ def save_conversation_to_file():
     except Exception as e:
         print(f"Error saving conversation: {e}")
 
+# =================== MAIN ===================
+
 if __name__ == '__main__':
     print("Starting Flask app...")
+    # a = threading.Thread(target=loop, daemon=True)
+    # a.start()
     app.run(debug=False)
