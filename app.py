@@ -263,4 +263,4 @@ if __name__ == '__main__':
     print("Starting Flask app...")
     a = threading.Thread(target=loop, daemon=True)
     a.start()
-    app.run(debug=True)
+    app.run(debug=False)
