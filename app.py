@@ -93,7 +93,7 @@ def scan(cam):
                 face = analysis[0]
                 region = face.get('region', {})
                 x, y, w, h = region.get('x', 0), region.get('y', 0), region.get('w', 0), region.get('h', 0)
-                frame_height, frame_width, _ = face.shape
+                frame_height, frame_width, _ = f.shape
                 is_valid_face = w > 0 and h > 0 and w < frame_width - 1 and h < frame_height - 1
 
                 if is_valid_face:
@@ -102,8 +102,8 @@ def scan(cam):
                     conf = latest_emotions.get(dominant_emotion, 0)
                     percent_text = f"Acc: {conf:.1f}%"
 
-                    # emoji_x, emoji_y = x, max(y - emoji_size[1] - 20, 0)
-                    # text_y = emoji_y + emoji_size[1] + 5
+                    emoji_x, emoji_y = x, max(y - emoji_size[1] - 20, 0)
+                    text_y = emoji_y + emoji_size[1] + 5
 
                     if dominant_emotion in emoji_map:
                         f = overlay_png_alpha(f, emoji_map[dominant_emotion], emoji_x, emoji_y)
