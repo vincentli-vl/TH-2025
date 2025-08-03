@@ -215,4 +215,4 @@ if __name__ == '__main__':
     print("  - /get_history (GET - conversation history)")
     a = threading.Thread(target=loop, daemon=True)
     a.start()
-    app.run(debug=False)
+    app.run(debug=True)
