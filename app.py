@@ -8,6 +8,8 @@ import cv2
 from deepface import DeepFace
 import numpy as np
 import time
+import matplotlib.pyplot as plt
+
 
 CAM0 = 0
 CAM1 = 1
@@ -57,6 +59,7 @@ for img_name in ["vivian.jpg", "vivian2.jpg"]:
 
 # Emotion data
 latest_emotions = {'angry': 0, 'disgust': 0, 'fear': 0, 'happy': 0, 'sad': 0, 'surprise': 0, 'neutral': 0}
+emotion_snapshots = []
 emoji_dir = "emojis"
 emoji_map = {}
 emoji_size = (80, 80)
@@ -99,6 +102,7 @@ def scan(cam):
         if not r:
             continue
 
+        frame_height, frame_width, _ = f.shape
         frame_count += 1
         # Only analyze every 10th frame for performance
         if frame_count % 10 == 0:
@@ -126,10 +130,11 @@ def scan(cam):
             y = int(region.get('y', 0) / scale_factor)
             w = int(region.get('w', 0) / scale_factor)
             h = int(region.get('h', 0) / scale_factor)
-            if w > 0 and h > 0:
+            if w > 0 and h > 0 and w < frame_width - 3 and h < frame_height - 3:
                 latest_emotions.update(face.get('emotion', latest_emotions))
                 dominant_emotion = face.get('dominant_emotion', 'neutral').lower()
                 conf = latest_emotions.get(dominant_emotion, 0)
+                emotion_snapshots.append(latest_emotions.copy())
                 percent_text = f"Acc: {conf:.1f}%"
                 emoji_x, emoji_y = x, max(y - emoji_size[1] - 20, 0)
                 text_y = emoji_y + emoji_size[1] + 5
@@ -223,30 +228,64 @@ def serve_audio(filename):
     from flask import send_from_directory
     return send_from_directory('static/audio', filename)
 
-@app.route('/chart')
-def chart():
-    import io
-    from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+# @app.route('/chart')
+# def chart():
+#     import io
+#     from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
-    fig, ax = plt.subplots(figsize=(3, 3))
-    values = list(latest_emotions.values())
-    labels = list(latest_emotions.keys())
-    total = sum(values)
+#     fig, ax = plt.subplots(figsize=(3, 3))
+#     values = list(latest_emotions.values())
+#     labels = list(latest_emotions.keys())
+#     total = sum(values)
 
-    if total == 0:
-        values = [1]
-        labels = ['None']
+#     if total == 0:
+#         values = [1]
+#         labels = ['None']
 
-    colors = ['#D7263D', '#8B5E3C', '#5D50A0', '#FFD700', '#2E86AB', '#FF6B35', "#219B7C"]
-    ax.pie(values, labels=labels, colors=colors[:len(values)], autopct='%1.1f%%', startangle=90)
-    ax.axis('equal')
+#     colors = ['#D7263D', '#8B5E3C', '#5D50A0', '#FFD700', '#2E86AB', '#FF6B35', "#219B7C"]
+#     ax.pie(values, labels=labels, colors=colors[:len(values)], autopct='%1.1f%%', startangle=90)
+#     ax.axis('equal')
 
-    canvas = FigureCanvas(fig)
-    output = io.BytesIO()
-    canvas.print_png(output)
-    plt.close(fig)
+#     canvas = FigureCanvas(fig)
+#     output = io.BytesIO()
+#     canvas.print_png(output)
+#     plt.close(fig)
 
-    return Response(output.getvalue(), mimetype='image/png')
+#     return Response(output.getvalue(), mimetype='image/png')
+# @app.route('/chart-anim')
+# def chart_anim():
+#     from matplotlib import pyplot as plt
+#     from matplotlib.animation import FuncAnimation, PillowWriter
+#     import io
+
+#     if not emotion_snapshots:
+#         return Response("No emotion data to animate.", status=204)
+
+#     fig, ax = plt.subplots(figsize=(4, 4))
+
+#     def update(frame):
+#         ax.clear()
+#         emotions = emotion_snapshots[frame]
+#         labels = list(emotions.keys())
+#         values = list(emotions.values())
+#         total = sum(values)
+
+#         if total == 0:
+#             labels = ['None']
+#             values = [1]
+
+#         colors = ['#D7263D', '#8B5E3C', '#5D50A0', '#FFD700', '#2E86AB', '#FF6B35', '#219B7C']
+#         ax.pie(values, labels=labels, colors=colors[:len(values)], autopct='%1.1f%%', startangle=90)
+#         ax.set_title(f"Frame {frame + 1}")
+#         ax.axis('equal')
+
+#     ani = FuncAnimation(fig, update, frames=min(len(emotion_snapshots), 30), interval=1000)
+
+#     gif_io = io.BytesIO()
+#     ani.save(gif_io, format='gif', writer=PillowWriter(fps=1))
+#     gif_io.seek(0)
+
+#     return Response(gif_io.getvalue(), mimetype='image/gif')
 
 # Utilities
 def generate_response(user_input):
@@ -302,6 +341,6 @@ def save_conversation_to_file():
 
 if __name__ == '__main__':
     print("Starting Flask app...")
-    plot_thread = threading.Thread(target=emotion_plotter, daemon=True)
-    plot_thread.start()
+    #plot_thread = threading.Thread(target=emotion_plotter, daemon=True)
+    #plot_thread.start()
     app.run(debug=False)
