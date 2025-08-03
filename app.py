@@ -166,7 +166,7 @@ def emotion_plotter():
 
 def emotion_tracker():
     global emotion_tracker_active
-    cap = cv2.VideoCapture(0)
+    cap = cam0
     if not cap.isOpened():
         print("Webcam not found.")
         return
@@ -263,4 +263,4 @@ if __name__ == '__main__':
     print("Starting Flask app...")
     a = threading.Thread(target=loop, daemon=True)
     a.start()
-    app.run(debug=True)
+    app.run(debug=False)
