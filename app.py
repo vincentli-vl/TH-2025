@@ -166,7 +166,7 @@ def emotion_plotter():
 
 def emotion_tracker():
     global emotion_tracker_active
-    cap = cv2.VideoCapture(0)
+    cap = cam0
     if not cap.isOpened():
         print("Webcam not found.")
         return
