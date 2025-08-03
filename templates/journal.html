@@ -1,152 +1,579 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="w-full px-4 py-6">
+<div class="space-y-6">
     <!-- Header -->
-    <div class="flex justify-between items-center mb-4">
-      <h1 class="text-2xl font-bold">Journal</h1>
-      <img src="https://github.com/shadcn.png" class="h-8 w-8 rounded-full" alt="User Avatar">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-semibold text-gray-900">Care Logs</h1>
+            <p class="text-sm text-gray-600">Track and monitor daily care events, incidents, and patterns.</p>
+        </div>
+        <button class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            New Log Entry
+        </button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex space-x-2 border-b border-gray-200">
+        <button class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-primary text-primary" data-tab="confusion">
+            Confusion Events
+        </button>
+        <button class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-600 hover:text-gray-900" data-tab="guest">
+            Guest Log
+        </button>
+        <button class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-600 hover:text-gray-900" data-tab="medication">
+            Medication
+        </button>
+        <button class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-600 hover:text-gray-900" data-tab="behavior">
+            Behavior
+        </button>
+        <button class="tab-btn px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-600 hover:text-gray-900" data-tab="create">
+            Create Log
+        </button>
     </div>
   
     <!-- Search and Filter -->
-    <div class="flex items-center gap-2 mb-4">
+    <div class="flex items-center gap-4">
       <div class="relative flex-1">
-        <input
-          type="text"
-          placeholder="Search logs..."
-          class="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-        />
-        <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+            <input type="text" id="search-input" placeholder="Search confusion events..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary">
+            <svg class="absolute left-3 top-2.5 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
         </svg>
       </div>
-      <button class="text-sm text-muted-foreground border rounded-md px-3 py-2 hover:bg-muted">Filter</button>
-    </div>
-  
-    <!-- Tabs -->
-    <div class="mb-4 border-b">
-      <nav class="flex space-x-4 text-sm font-medium" id="tabs">
-        <button class="tab-btn text-muted-foreground px-3 py-2 border-b-2 border-transparent hover:text-primary data-[active=true]:text-primary data-[active=true]:border-primary" data-tab="confusion" data-active="true">Confusion</button>
-        <button class="tab-btn text-muted-foreground px-3 py-2 border-b-2 border-transparent hover:text-primary data-[active=false]:text-primary data-[active=false]:border-transparent" data-tab="medication" data-active="false">Medication</button>
-        <button class="tab-btn text-muted-foreground px-3 py-2 border-b-2 border-transparent hover:text-primary data-[active=false]:text-primary data-[active=false]:border-transparent" data-tab="guest" data-active="false">Guest</button>
-        <button class="tab-btn text-muted-foreground px-3 py-2 border-b-2 border-transparent hover:text-primary data-[active=false]:text-primary data-[active=false]:border-transparent" data-tab="behavior" data-active="false">Behavior</button>
-      </nav>
+        <button class="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"></path>
+            </svg>
+            <span id="filter-text">Filter by Severity</span>
+        </button>
     </div>
   
     <!-- Tab Content -->
     <div id="tab-content">
-      <!-- Confusion -->
-      <div class="tab-panel" data-tab="confusion">
-        <div class="space-y-4">
-          <div class="rounded-lg border p-4">
-            <div class="flex justify-between items-start">
+        <!-- Confusion Events Tab -->
+        <div class="tab-panel space-y-4" data-tab="confusion">
+            <!-- Confusion Event 1 -->
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                        <h3 class="text-lg font-semibold text-gray-900">Confusion Episode</h3>
+                        <span class="bg-primary-light text-primary text-xs px-2 py-1 rounded-full font-medium">medium severity</span>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-center gap-4 text-sm text-gray-600">
+                        <div class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <span>02/08/2025</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span>14:45:00</span>
+                        </div>
+                        <span>Duration: 5 minutes</span>
+                    </div>
+
+                    <div>
+                        <span class="text-sm font-medium text-gray-900">Trigger:</span>
+                        <span class="text-sm text-gray-600 ml-2">Unrecognized visitor</span>
+                    </div>
+
+                    <div>
+                        <span class="text-sm font-medium text-gray-900">Description:</span>
+                        <p class="text-sm text-gray-600 mt-1">Did not recognize visiting nurse Sarah despite previous visits. Became agitated and asked who she was multiple times.</p>
+                    </div>
+
+                    <div>
+                        <span class="text-sm font-medium text-gray-900">Resolution:</span>
+                        <p class="text-sm text-gray-600 mt-1">Voice assistant played familiar recording explaining who Sarah is. Calmed down after 5 minutes.</p>
+                    </div>
+
               <div>
-                <h3 class="text-base font-semibold">Confused by kitchen cabinet</h3>
-                <p class="text-sm text-muted-foreground">Maria was confused about how to open the kitchen cabinet</p>
+                        <span class="text-sm font-medium text-gray-900">Witnesses:</span>
+                        <p class="text-sm text-gray-600 mt-1">Sarah (Nurse), System Recording</p>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 mt-3">
+                        <span class="bg-secondary-light text-secondary text-xs px-2 py-1 rounded-full">#visitor</span>
+                        <span class="bg-secondary-light text-secondary text-xs px-2 py-1 rounded-full">#healthcare</span>
+                        <span class="bg-secondary-light text-secondary text-xs px-2 py-1 rounded-full">#agitation</span>
+                    </div>
               </div>
-              <span class="text-xs text-muted-foreground">2 hours ago</span>
             </div>
+
+            <!-- Confusion Event 2 -->
+            <div class="bg-yellow-50 rounded-lg border border-yellow-200 p-6">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                        <h3 class="text-lg font-semibold text-gray-900">Confusion Episode</h3>
+                        <span class="bg-secondary-light text-secondary text-xs px-2 py-1 rounded-full font-medium">low severity</span>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-center gap-4 text-sm text-gray-600">
+                        <div class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <span>01/08/2025</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span>09:30:00</span>
+                        </div>
+                        <span>Duration: 2 minutes</span>
+                    </div>
+
+                    <div>
+                        <span class="text-sm font-medium text-gray-900">Trigger:</span>
+                        <span class="text-sm text-gray-600 ml-2">Morning routine</span>
+                    </div>
+
+                    <div>
+                        <span class="text-sm font-medium text-gray-900">Description:</span>
+                        <p class="text-sm text-gray-600 mt-1">Forgot where bathroom was located. Stood in hallway looking confused.</p>
           </div>
-          <div class="rounded-lg border p-4">
-            <div class="flex justify-between items-start">
+
               <div>
-                <h3 class="text-base font-semibold">Woke up disoriented</h3>
-                <p class="text-sm text-muted-foreground">Maria woke up not knowing where she was</p>
+                        <span class="text-sm font-medium text-gray-900">Resolution:</span>
+                        <p class="text-sm text-gray-600 mt-1">Voice assistant provided gentle direction. Found bathroom without further assistance.</p>
               </div>
-              <span class="text-xs text-muted-foreground">4 hours ago</span>
+
+                    <div>
+                        <span class="text-sm font-medium text-gray-900">Witnesses:</span>
+                        <p class="text-sm text-gray-600 mt-1">System Only</p>
+            </div>
+
+                    <div class="flex flex-wrap gap-2 mt-3">
+                        <span class="bg-secondary-light text-secondary text-xs px-2 py-1 rounded-full">#routine</span>
+                        <span class="bg-secondary-light text-secondary text-xs px-2 py-1 rounded-full">#orientation</span>
+                        <span class="bg-secondary-light text-secondary text-xs px-2 py-1 rounded-full">#morning</span>
+          </div>
+        </div>
+      </div>
+  
+            <!-- Confusion Event 3 -->
+            <div class="bg-pink-50 rounded-lg border border-pink-200 p-6">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                        <h3 class="text-lg font-semibold text-gray-900">Confusion Episode</h3>
+                        <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full font-medium">high severity</span>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-center gap-4 text-sm text-gray-600">
+                        <div class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <span>31/07/2025</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span>16:20:00</span>
+                        </div>
+                        <span>Duration: 15 minutes</span>
+                    </div>
+
+              <div>
+                        <span class="text-sm font-medium text-gray-900">Trigger:</span>
+                        <span class="text-sm text-gray-600 ml-2">Evening shadows</span>
+              </div>
+
+                    <div>
+                        <span class="text-sm font-medium text-gray-900">Description:</span>
+                        <p class="text-sm text-gray-600 mt-1">Became very upset about shadows in living room, thought there were intruders. Called for help repeatedly.</p>
+            </div>
+
+                    <div>
+                        <span class="text-sm font-medium text-gray-900">Resolution:</span>
+                        <p class="text-sm text-gray-600 mt-1">Family member called remotely via system. Lights were turned on and confusion cleared.</p>
+          </div>
+
+              <div>
+                        <span class="text-sm font-medium text-gray-900">Witnesses:</span>
+                        <p class="text-sm text-gray-600 mt-1">Emergency Contact - Sarah</p>
+              </div>
+
+                    <div class="flex flex-wrap gap-2 mt-3">
+                        <span class="bg-secondary-light text-secondary text-xs px-2 py-1 rounded-full">#sundowning</span>
+                        <span class="bg-secondary-light text-secondary text-xs px-2 py-1 rounded-full">#hallucination</span>
+                        <span class="bg-secondary-light text-secondary text-xs px-2 py-1 rounded-full">#evening</span>
             </div>
           </div>
         </div>
       </div>
   
-      <!-- Medication -->
-      <div class="tab-panel hidden" data-tab="medication">
-        <div class="space-y-4">
-          <div class="rounded-lg border p-4">
-            <div class="flex justify-between items-start">
+        <!-- Guest Log Tab -->
+        <div class="tab-panel hidden space-y-4" data-tab="guest">
+            <!-- Guest Entry 1 -->
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-primary-light rounded-full flex items-center justify-center">
+                            <span class="text-sm font-medium text-primary">JS</span>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Jake Smith</h3>
+                            <p class="text-sm text-gray-600">Grandson</p>
+                        </div>
+                    </div>
+                    <span class="bg-primary-light text-primary text-xs px-2 py-1 rounded-full">Recognized</span>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-center gap-4 text-sm text-gray-600">
+                        <div class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <span>02/08/2025, 11:15:00</span>
+                        </div>
+                        <span>Duration: 2 hours</span>
+                    </div>
+
+                    <div>
+                        <span class="text-sm font-medium text-gray-900">Notes:</span>
+                        <p class="text-sm text-gray-600 mt-1">Regular weekly visit. Brought flowers and spent time in garden.</p>
+                    </div>
+
+                    <div>
+                        <span class="text-sm font-medium text-gray-900">Mood Change:</span>
+                        <span class="text-sm text-gray-600 ml-2">neutral → happy</span>
+                    </div>
+
+                    <div class="flex gap-2 mt-3">
+                        <button class="flex items-center gap-1 px-3 py-1 text-xs border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                            View Photo
+                        </button>
+                        <button class="flex items-center gap-1 px-3 py-1 text-xs border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                            Video Recording
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guest Entry 2 -->
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                            <span class="text-sm font-medium text-gray-600">SJ</span>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Sarah Johnson</h3>
+                            <p class="text-sm text-gray-600">Visiting Nurse</p>
+                        </div>
+                    </div>
+                    <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">Unknown</span>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-center gap-4 text-sm text-gray-600">
+                        <div class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <span>02/08/2025, 14:30:00</span>
+                        </div>
+                        <span>Duration: 45 minutes</span>
+                    </div>
+
+                    <div>
+                        <span class="text-sm font-medium text-gray-900">Notes:</span>
+                        <p class="text-sm text-gray-600 mt-1">Health check visit. Patient did not recognize initially, required voice assistance.</p>
+                    </div>
+
               <div>
-                <h3 class="text-base font-semibold">Took morning medication</h3>
-                <p class="text-sm text-muted-foreground">Maria took 2 pills of Aricept</p>
+                        <span class="text-sm font-medium text-gray-900">Mood Change:</span>
+                        <span class="text-sm text-gray-600 ml-2">neutral → confused</span>
+                    </div>
+
+                    <div class="flex gap-2 mt-3">
+                        <button class="flex items-center gap-1 px-3 py-1 text-xs border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                            View Photo
+                        </button>
+                        <button class="flex items-center gap-1 px-3 py-1 text-xs border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                            Video Recording
+                        </button>
+                    </div>
               </div>
-              <span class="text-xs text-muted-foreground">Today at 8:30am</span>
             </div>
           </div>
-          <div class="rounded-lg border p-4">
-            <div class="flex justify-between items-start">
+
+        <!-- Medication Tab -->
+        <div class="tab-panel hidden space-y-4" data-tab="medication">
+            <!-- Medication Entry 1 -->
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Aricept 10mg</h3>
+                            <p class="text-sm text-gray-600">02/08/2025, 08:00:00</p>
+                        </div>
+                    </div>
+                    <span class="bg-primary-light text-primary text-xs px-2 py-1 rounded-full">taken</span>
+                </div>
+
+                <div class="space-y-2">
+                    <div>
+                        <span class="text-sm font-medium text-gray-900">Action:</span>
+                        <span class="text-sm text-gray-600 ml-2">self-administered</span>
+                    </div>
               <div>
-                <h3 class="text-base font-semibold">Missed evening dose</h3>
-                <p class="text-sm text-muted-foreground">Maria forgot to take evening medication</p>
+                        <span class="text-sm font-medium text-gray-900">Note:</span>
+                        <span class="text-sm text-gray-600 ml-2">Taken with breakfast as scheduled</span>
+                    </div>
               </div>
-              <span class="text-xs text-muted-foreground">Yesterday at 9:00pm</span>
+            </div>
+
+            <!-- Medication Entry 2 -->
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Melatonin 3mg</h3>
+                            <p class="text-sm text-gray-600">02/08/2025, 20:00:00</p>
+                        </div>
+                    </div>
+                    <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">missed</span>
+                </div>
+
+                <div class="space-y-2">
+                    <div>
+                        <span class="text-sm font-medium text-gray-900">Action:</span>
+                        <span class="text-sm text-gray-600 ml-2">reminder-given</span>
+                    </div>
+                    <div>
+                        <span class="text-sm font-medium text-gray-900">Note:</span>
+                        <span class="text-sm text-gray-600 ml-2">Patient refused, said already taken (incorrect)</span>
             </div>
           </div>
         </div>
       </div>
   
-      <!-- Guest -->
-      <div class="tab-panel hidden" data-tab="guest">
-        <div class="space-y-4">
-          <div class="rounded-lg border p-4">
-            <div class="flex justify-between items-start">
+        <!-- Behavior Tab -->
+        <div class="tab-panel hidden space-y-4" data-tab="behavior">
+            <!-- Behavior Entry 1 -->
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Repetitive Questions</h3>
+                            <p class="text-sm text-gray-600">high frequency</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-center gap-4 text-sm text-gray-600">
+                        <div class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <span>02/08/2025, 15:30:00</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span>20 minutes</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="text-sm font-medium text-gray-900">Context:</span>
+                        <span class="text-sm text-gray-600 ml-2">After visitor left</span>
+                    </div>
+
+                    <div>
+                        <span class="text-sm font-medium text-gray-900">Intervention:</span>
+                        <span class="text-sm text-gray-600 ml-2">Redirected to photo album activity</span>
+                    </div>
+
               <div>
-                <h3 class="text-base font-semibold">John visited</h3>
-                <p class="text-sm text-muted-foreground">Maria's son visited for lunch</p>
+                        <span class="text-sm font-medium text-gray-900">Notes:</span>
+                        <p class="text-sm text-gray-600 mt-1">Asked "When is Sarah coming?" 8 times in 20 minutes</p>
+                    </div>
               </div>
-              <span class="text-xs text-muted-foreground">Yesterday at 12:45pm</span>
             </div>
+
+            <!-- Behavior Entry 2 -->
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Wandering</h3>
+                            <p class="text-sm text-gray-600">medium frequency</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-center gap-4 text-sm text-gray-600">
+                        <div class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                            <span>02/08/2025, 10:45:00</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span>10 minutes</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="text-sm font-medium text-gray-900">Context:</span>
+                        <span class="text-sm text-gray-600 ml-2">Looking for kitchen</span>
+                    </div>
+
+                    <div>
+                        <span class="text-sm font-medium text-gray-900">Intervention:</span>
+                        <span class="text-sm text-gray-600 ml-2">Voice guidance provided</span>
           </div>
-          <div class="rounded-lg border p-4">
-            <div class="flex justify-between items-start">
+
               <div>
-                <h3 class="text-base font-semibold">Caretaker check-in</h3>
-                <p class="text-sm text-muted-foreground">Caretaker checked vitals and cleaned</p>
+                        <span class="text-sm font-medium text-gray-900">Notes:</span>
+                        <p class="text-sm text-gray-600 mt-1">Walked in circles in living room, responded well to voice directions</p>
+                    </div>
               </div>
-              <span class="text-xs text-muted-foreground">Today at 9:15am</span>
             </div>
-          </div>
         </div>
-      </div>
-  
-      <!-- Behavior -->
-      <div class="tab-panel hidden" data-tab="behavior">
-        <div class="space-y-4">
-          <div class="rounded-lg border p-4">
-            <div class="flex justify-between items-start">
-              <div>
-                <h3 class="text-base font-semibold">Agitated in afternoon</h3>
-                <p class="text-sm text-muted-foreground">Maria was pacing and talking loudly</p>
-              </div>
-              <span class="text-xs text-muted-foreground">Today at 3:00pm</span>
-            </div>
-          </div>
-          <div class="rounded-lg border p-4">
-            <div class="flex justify-between items-start">
-              <div>
-                <h3 class="text-base font-semibold">Calm during dinner</h3>
-                <p class="text-sm text-muted-foreground">Maria was calm and talkative over dinner</p>
-              </div>
-              <span class="text-xs text-muted-foreground">Yesterday at 6:30pm</span>
-            </div>
-          </div>
+
+        <!-- Create Log Tab -->
+        <div class="tab-panel hidden" data-tab="create">
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Create New Log Entry</h3>
+                <p class="text-sm text-gray-600 mb-6">This feature will be available soon for creating new care log entries.</p>
         </div>
       </div>
     </div>
   </div>
   
-  <!-- Tab Logic -->
   <script>
-    document.querySelectorAll('.tab-btn').forEach(button => {
-      button.addEventListener('click', () => {
-        const tab = button.dataset.tab;
-  
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-          btn.setAttribute('data-active', btn.dataset.tab === tab);
+    // Tab switching functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabPanels = document.querySelectorAll('.tab-panel');
+        const searchInput = document.getElementById('search-input');
+        const filterText = document.getElementById('filter-text');
+        
+        // Tab-specific search placeholders and filter text
+        const tabConfig = {
+            confusion: {
+                searchPlaceholder: 'Search confusion events...',
+                filterText: 'Filter by Severity'
+            },
+            guest: {
+                searchPlaceholder: 'Search guest visits...',
+                filterText: 'Filter by Recognition'
+            },
+            medication: {
+                searchPlaceholder: 'Search medication logs...',
+                filterText: 'Filter by Status'
+            },
+            behavior: {
+                searchPlaceholder: 'Search behavior patterns...',
+                filterText: 'Filter by Frequency'
+            },
+            create: {
+                searchPlaceholder: 'Search log entries...',
+                filterText: 'Filter by Type'
+            }
+        };
+        
+        // Function to switch tabs
+        function switchTab(tabName) {
+            // Update tab buttons
+            tabButtons.forEach(btn => {
+                btn.classList.remove('border-primary', 'text-primary');
+                btn.classList.add('border-transparent', 'text-gray-600');
+            });
+            
+            // Find and activate the clicked button
+            const activeButton = document.querySelector(`[data-tab="${tabName}"]`);
+            if (activeButton) {
+                activeButton.classList.remove('border-transparent', 'text-gray-600');
+                activeButton.classList.add('border-primary', 'text-primary');
+            }
+            
+            // Hide all tab panels
+            tabPanels.forEach(panel => {
+                panel.classList.add('hidden');
+            });
+            
+            // Show the selected tab panel
+            const activePanel = document.querySelector(`.tab-panel[data-tab="${tabName}"]`);
+            if (activePanel) {
+                activePanel.classList.remove('hidden');
+            }
+            
+            // Update search placeholder and filter text
+            if (tabConfig[tabName]) {
+                searchInput.placeholder = tabConfig[tabName].searchPlaceholder;
+                filterText.textContent = tabConfig[tabName].filterText;
+            }
+        }
+        
+        // Add click event listeners to all tab buttons
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tabName = button.getAttribute('data-tab');
+                switchTab(tabName);
+            });
         });
-  
-        document.querySelectorAll('.tab-panel').forEach(panel => {
-          panel.classList.toggle('hidden', panel.dataset.tab !== tab);
-        });
-      });
+        
+        // Initialize with confusion tab active
+        switchTab('confusion');
     });
   </script>
 {% endblock %}

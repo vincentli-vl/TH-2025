@@ -1,6 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
 
+<!-- Navigation for landing page -->
+<nav class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <div class="flex items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-pink-500 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-semibold text-gray-900">Echocare</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="/dashboard" class="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700 transition-colors">
+                    Go to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
 <!-- Hero Section -->
 <section class="relative px-6 py-24 lg:px-8 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200">
   <div class="mx-auto max-w-5xl text-center mb-12">
@@ -24,7 +47,7 @@
       Track daily activities, log important events, and coordinate care with voice and face recognition technology.
     </p>
     <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-      <a href="#" class="bg-pink-600 text-white px-8 py-4 rounded-xl text-lg flex items-center">
+      <a href="/dashboard" class="bg-pink-600 text-white px-8 py-4 rounded-xl text-lg flex items-center">
         Start Today <i data-lucide="arrow-right" class="ml-2 w-6 h-6"></i>
       </a>
       <a href="#" class="border border-pink-600 text-pink-600 px-8 py-4 rounded-xl text-lg">
@@ -79,7 +102,7 @@
     <p class="text-lg text-gray-600 mb-8">
       Join families already using Echocare to provide better, more coordinated care.
     </p>
-    <a href="#" class="bg-pink-600 text-white px-10 py-4 rounded-xl text-lg inline-flex items-center">
+    <a href="/dashboard" class="bg-pink-600 text-white px-10 py-4 rounded-xl text-lg inline-flex items-center">
       Begin Your Care Journey <i data-lucide="arrow-right" class="ml-2 w-6 h-6"></i>
     </a>
     <div class="mt-6 text-sm text-gray-500">
