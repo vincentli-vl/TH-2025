@@ -44,6 +44,26 @@ def home():
 def voice():
     return render_template('voice.html')
 
+@app.route('/camera')
+def camera():
+    return render_template('camera.html')
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
+
+@app.route('/profile')
+def profile():
+    return render_template('profile.html')
+
+@app.route('/settings')
+def settings():
+    return render_template('settings.html')
+
+@app.route('/journal')
+def journal():
+    return render_template('journal.html')
+
 @app.route('/transcribe', methods=['POST'])
 def transcribe_audio():
     try:
@@ -243,4 +263,4 @@ if __name__ == '__main__':
     print("Starting Flask app...")
     a = threading.Thread(target=loop, daemon=True)
     a.start()
-    app.run(debug=False)
+    app.run(debug=True)

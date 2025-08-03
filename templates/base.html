@@ -8,7 +8,25 @@
     <title>Page Title</title>
 </head>
 <body>
-    {% block content %}{% endblock %}
+    <header class="bg-gray-800 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <nav class="flex items-center justify-between h-16">
+            <div class="flex items-center space-x-8">
+              <a href="/" class="text-xl font-semibold">Echocare</a>
+              <ul class="hidden md:flex space-x-6">
+                  <li><a href="/" class="hover:text-gray-300">Home</a></li>
+                  <li><a href="/dashboard" class="hover:text-gray-300">Dashboard</a></li>
+                  <li><a href="/voice" class="hover:text-gray-300">Voice</a></li>
+                  <li><a href="/camera" class="hover:text-gray-300">Camera</a></li>
+                  <li><a href="/journal" class="hover:text-gray-300">Journal</a></li>
+                  <li><a href="/profile" class="hover:text-gray-300">Profile</a></li>
+                  <li><a href="/settings" class="hover:text-gray-300">Settings</a></li>
+              </ul>
+            </div>
+          </nav>
+        </div>
+      </header>
+    {% block content %} {% endblock %}
     
     <script>
         // Voice Recognition functionality
