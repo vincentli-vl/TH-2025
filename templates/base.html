@@ -25,6 +25,7 @@
 </head>
 <body class="bg-gray-50">
     <div class="flex h-screen">
+        {% if request.path != '/' %}
         <!-- Left Sidebar -->
         <div class="w-64 bg-white shadow-lg flex flex-col">
             <!-- Logo Section -->
@@ -142,6 +143,7 @@
                     </div>
                 </div>
             </header>
+            {% endif %}
 
             <!-- Main Content -->
             <main class="flex-1 p-6 overflow-y-auto">
