@@ -40,6 +40,7 @@
             </div>
           </div>
           <div class="relative aspect-video bg-gray-900 rounded-b-lg overflow-hidden">
+            <img src="/c0" class="absolute inset-0 w-full h-full object-cover z-0" />
             <div class="absolute inset-0 flex items-center justify-center text-white opacity-75 text-center">
               <div>
                 <p class="text-lg font-medium">Live Camera Feed</p>
@@ -115,6 +116,14 @@
           <div id="events-list" class="mt-2 space-y-2"></div>
           <button id="btn-all-events" class="mt-2 w-full p-2 border rounded text-sm">View All Events</button>
         </div>
+        <!-- Emotion Chart Animation -->
+        <div class="border rounded-lg shadow-sm p-4">
+          <h3 class="flex items-center gap-2 font-semibold">Emotion Chart (Animated)</h3>
+          <div class="mt-2">
+            <img src="/chart-anim" alt="Animated Emotion Chart" class="w-full rounded">
+          </div>
+        </div>
+
         <div class="border rounded-lg shadow-sm p-4">
           <h3 class="flex items-center gap-2 font-semibold">Recording Status</h3>
           <div class="mt-2 space-y-4">
@@ -257,6 +266,13 @@
       const now = new Date();
       currentTimeEl.textContent = now.toLocaleTimeString();
     },1000);
+
+    setInterval(() => {
+      const chartImg = document.querySelector('img[src^="/chart-anim"]');
+      if (chartImg) {
+        chartImg.src = '/chart-anim?ts=' + new Date().getTime(); // bust cache
+      }
+    }, 5000); // Refresh every 5 seconds
   
     // Initialize
     populateSelects();
