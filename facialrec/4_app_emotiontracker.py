@@ -37,19 +37,20 @@ def overlay_png_alpha(img, png_img, x, y):
 
 def emotion_plotter():
     plt.ion()
-    fig, ax = plt.subplots(figsize=(7, 4))
-    bars = ax.bar(latest_emotions.keys(), latest_emotions.values(), color='skyblue')
-    ax.set_ylim(0, 100)
-    ax.set_ylabel("Confidence (%)")
-    ax.set_title("Real-Time Emotion Confidence")
-    plt.show(block=False)
+    fig, ax = plt.subplots(figsize=(5, 5))
     while not stop_thread:
-        for bar, key in zip(bars, latest_emotions.keys()):
-            bar.set_height(latest_emotions[key])
-        fig.canvas.draw()
-        fig.canvas.flush_events()
-        time.sleep(0.1)
-    plt.ioff()
+        ax.clear()
+        values = list(latest_emotions.values())
+        labels = list(latest_emotions.keys())
+        total = sum(values)
+        if total == 0:
+            time.sleep(0.1)
+            continue
+        percentages = [v / total * 100 for v in values]
+        ax.pie(percentages, labels=labels, autopct='%1.1f%%', startangle=140)
+        ax.set_title("Real-Time Emotion Pie Chart")
+        plt.draw()
+        plt.pause(0.1)
     plt.close()
 
 def start_tracker():
@@ -86,10 +87,8 @@ def start_tracker():
                 conf = latest_emotions.get(dominant, 0)
                 conf_text = f"Acc: {conf:.1f}%"
 
-                # Face rectangle
                 cv2.rectangle(frame, (x, y), (x + w, y + h), CYAN, 2)
 
-                # Emoji & Text Position
                 emoji_y = max(y - emoji_size[1] - 20, 0)
                 text_y = emoji_y + emoji_size[1] + 5
                 if dominant in emoji_map:
@@ -113,5 +112,5 @@ def start_tracker():
     plot_thread.join()
 
 if __name__ == '__main__':
-    print("Launching emotion tracker...")
+    print("Launching emotion tracker with pie chart...")
     start_tracker()
