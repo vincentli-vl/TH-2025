@@ -6,7 +6,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <title>Echocare Family Care Monitor</title>
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
     <style>
         .bg-primary { background-color: #83DEF7; }
         .bg-primary-light { background-color: #E8F7FD; }
@@ -432,8 +432,12 @@
                     const data = await response.json();
                     
                     if (data.success) {
-                        this.displayResponse(data.response);
                         this.updateStatus('Response received');
+                        // Play audio file if available
+                        if (data.audio_file) {
+                            this.playAudioFile(data.audio_file);
+                        }
+                        
                         // Clear the transcription display
                         document.getElementById('transcription-display').textContent = '';
                         this.transcript = '';
@@ -447,19 +451,14 @@
                 }
             }
 
-            displayResponse(response) {
-                const responseDisplay = document.getElementById('response-display');
-                if (responseDisplay) {
-                    responseDisplay.textContent = response;
-                    responseDisplay.classList.add('bg-green-100', 'p-3', 'rounded', 'mt-2');
-                    
-                    // Auto-hide after 5 seconds
-                    setTimeout(() => {
-                        responseDisplay.classList.remove('bg-green-100', 'p-3', 'rounded', 'mt-2');
-                        responseDisplay.textContent = '';
-                    }, 5000);
-                } else {
-                    console.error('❌ Response display element not found!');
+            playAudioFile(filename) {
+                try {
+                    const audio = new Audio(`/static/audio/${filename}`);
+                    audio.play().catch(error => {
+                        console.error('Error playing audio:', error);
+                    });
+                } catch (error) {
+                    console.error('Error creating audio element:', error);
                 }
             }
 

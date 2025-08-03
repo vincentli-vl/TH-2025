@@ -3,14 +3,11 @@ import speech_recognition as sr
 import json
 import os
 from datetime import datetime
-import pyttsx3
 import threading
 import cv2
 from deepface import DeepFace
 import numpy as np
 import time
-import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 
 CAM0 = 0
 CAM1 = 1
@@ -23,14 +20,24 @@ conversations_folder = "conversations"
 if not os.path.exists(conversations_folder):
     os.makedirs(conversations_folder)
 
-try:
-    tts_engine = pyttsx3.init()
-    tts_engine.setProperty('rate', 150)
-    tts_engine.setProperty('volume', 0.9)
-    tts_available = True
-except Exception as e:
-    print(f"Text-to-speech not available: {e}")
-    tts_available = False
+# Audio files mapping
+audio_responses = {
+    "where am i": "1.wav",
+    "who are you": "2.wav",
+    "why am i here": "3.wav",
+    "i want to go home": "4.wav",
+    "what is going on": "5.wav",
+    "hungry": "6.wav",
+    "thirsty": "6.wav",
+    "bed": "7.wav",
+    "i miss": "8.wav",
+    "doing today": "9.wav",
+    "remember": "10.wav",
+    "medicine": "11.wav",
+    "eat": "12.wav",
+    "niece": "13.wav",
+    "default": "13.wav"
+}
 
 cam0 = cv2.VideoCapture(CAM0 + cv2.CAP_DSHOW)
 cam1 = cv2.VideoCapture(CAM1 + cv2.CAP_DSHOW)
@@ -54,7 +61,6 @@ emoji_dir = "emojis"
 emoji_map = {}
 emoji_size = (80, 80)
 CYAN = (255, 255, 0)
-stop_plot_thread = False
 
 for emo in latest_emotions.keys():
     path = os.path.join(emoji_dir, f"{emo}.png")
@@ -87,13 +93,14 @@ def recognize_identity(face_embedding):
 def scan(cam):
     frame_count = 0
     analysis_results = []
-    scale_factor = 0.5
+    scale_factor = 0.5  # Must match fx, fy in resize
     while True:
         r, f = cam.read()
         if not r:
             continue
 
         frame_count += 1
+        # Only analyze every 10th frame for performance
         if frame_count % 10 == 0:
             try:
                 small_f = cv2.resize(f, (0, 0), fx=scale_factor, fy=scale_factor)
@@ -103,6 +110,7 @@ def scan(cam):
                     enforce_detection=False,
                     detector_backend="opencv"
                 )
+                # DeepFace returns a dict for one face, or a list for multiple
                 if isinstance(analysis, dict):
                     analysis_results = [analysis]
                 elif isinstance(analysis, list):
@@ -110,8 +118,10 @@ def scan(cam):
             except Exception as e:
                 print(f"Face scan error: {e}")
 
+        # Draw results for all detected faces
         for face in analysis_results:
             region = face.get('region', {})
+            # Scale coordinates back to original frame size
             x = int(region.get('x', 0) / scale_factor)
             y = int(region.get('y', 0) / scale_factor)
             w = int(region.get('w', 0) / scale_factor)
@@ -135,9 +145,9 @@ def scan(cam):
 
         frame_bytes = buffer.tobytes()
         yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+               b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n') 
 
-# Flask routes
+# Routes
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -185,14 +195,21 @@ def transcribe_audio():
 
         text = data['text']
         conversation_history.append({'timestamp': datetime.now().isoformat(), 'user_input': text, 'type': 'user'})
-        response = generate_response(text)
-        conversation_history.append({'timestamp': datetime.now().isoformat(), 'response': response, 'type': 'system'})
+        
+        # Generate response (now returns audio filename)
+        audio_filename = generate_response(text)
+        
+        # Add the response to conversation history
+        conversation_history.append({'timestamp': datetime.now().isoformat(), 'response': audio_filename, 'type': 'system'})
         save_conversation_to_file()
 
-        if tts_available:
-            threading.Thread(target=play_audio_response, args=(response,), daemon=True).start()
-
-        return jsonify({'transcription': text, 'response': response, 'success': True})
+        # Return the audio filename to the frontend
+        return jsonify({
+            'transcription': text, 
+            'response': audio_filename, 
+            'audio_file': audio_filename,
+            'success': True
+        })
     except Exception as e:
         return jsonify({'error': f'Error processing transcription: {e}'}), 500
 
@@ -200,28 +217,48 @@ def transcribe_audio():
 def get_history():
     return jsonify(conversation_history)
 
+@app.route('/static/audio/<filename>')
+def serve_audio(filename):
+    from flask import send_from_directory
+    return send_from_directory('static/audio', filename)
+
 # Utilities
 def generate_response(user_input):
-    lower = user_input.lower()
-    if 'hello' in lower or 'hi' in lower:
-        return "Hello! How can I help you today?"
-    elif 'how are you' in lower:
-        return "I'm doing well, thank you for asking!"
-    elif 'bye' in lower:
-        return "Goodbye! Have a great day!"
-    elif 'weather' in lower:
-        return "I'm sorry, I don't have access to weather information right now."
-    elif 'time' in lower:
-        return f"The current time is {datetime.now().strftime('%H:%M')}."
+    lower = user_input.lower().strip()
+    
+    # Check for exact matches first
+    if lower in audio_responses:
+        return audio_responses[lower]
+    
+    # Check for partial matches
+    if any(word in lower for word in ['where am', 'where are', 'where is', 'where i']):
+        return audio_responses['where am i']
+    elif any(phrase in lower for phrase in ['who', 'are you']):
+        return audio_responses['who are you']
+    elif any(word in lower for word in ['why am', 'i here']):
+        return audio_responses['why am i here']
+    elif any(word in lower for word in ['go home', 'to go']):
+        return audio_responses['i want to go home']
+    elif any(word in lower for word in ['going on']):
+        return audio_responses['what is going on']
+    elif any(word in lower for word in ['hungry', 'thirsty']):
+        return audio_responses['hungry']
+    elif any(word in lower for word in ['bed', 'sleep', 'time to go']):
+        return audio_responses['bed']
+    elif any(word in lower for word in ['i miss', 'family', 'friend']):
+        return audio_responses['i miss']
+    elif any(word in lower for word in ['doing today', 'we doing']):
+        return audio_responses['doing today']
+    elif any(word in lower for word in ['can\'t remember', 'cannot remember', 'remember']):
+        return audio_responses['remember']
+    elif any(word in lower for word in ['medicine', 'medication']):
+        return audio_responses['medicine']
+    elif any(word in lower for word in ['eat', 'food']):
+        return audio_responses['eat']
+    elif any(word in lower for word in ['niece', 'nephew']):
+        return audio_responses['niece']
     else:
-        return f"I heard you say: '{user_input}'. That's interesting!"
-
-def play_audio_response(text):
-    try:
-        tts_engine.say(text)
-        tts_engine.runAndWait()
-    except Exception as e:
-        print(f"Error playing audio: {e}")
+        return audio_responses['default']
 
 def save_conversation_to_file():
     try:
@@ -236,61 +273,6 @@ def save_conversation_to_file():
                 f.write("\n")
     except Exception as e:
         print(f"Error saving conversation: {e}")
-
-def emotion_plotter():
-    plt.ion()
-    previous_emotions = None
-
-    fig = plt.figure(figsize=(10, 6))
-    pie_ax = fig.add_axes([0.05, 0.1, 0.5, 0.8])
-    legend_ax = fig.add_axes([0.62, 0.05, 0.35, 0.9])
-    legend_ax.axis('off')
-
-    while not stop_plot_thread:
-        current = latest_emotions.copy()
-        if current == previous_emotions:
-            time.sleep(0.1)
-            continue
-
-        pie_ax.clear()
-        values = list(current.values())
-        labels = list(current.keys())
-        total = sum(values)
-        if total == 0:
-            time.sleep(0.1)
-            continue
-
-        percentages = [v / total * 100 for v in values]
-        custom_colors = {
-            'angry': '#D7263D',
-            'disgust': '#8B5E3C',
-            'fear': '#5D50A0',
-            'happy': '#FFD700',
-            'sad': '#2E86AB',
-            'surprise': '#FF6B35',
-            'neutral': "#219B7C"
-        }
-        colors = [custom_colors.get(label, '#CCCCCC') for label in labels]
-
-        wedges, _ = pie_ax.pie(percentages, colors=colors, startangle=140)
-        pie_ax.set_title("Real-Time Emotion Pie Chart", fontsize=14)
-
-        legend_ax.clear()
-        legend_ax.axis('off')
-        spacing = 0.09
-        total_items = len(labels)
-        start_y = 0.5 + (spacing * (total_items - 1)) / 2
-
-        for i, (label, pct, color) in enumerate(zip(labels, percentages, colors)):
-            y = start_y - i * spacing
-            legend_ax.add_patch(mpatches.Rectangle((0.0, y - 0.03), 0.08, 0.06, color=color, transform=legend_ax.transAxes))
-            legend_ax.text(0.12, y, f"{label.capitalize():<10} {pct:5.1f}%", fontsize=12, va='center', transform=legend_ax.transAxes)
-
-        plt.draw()
-        plt.pause(0.1)
-        previous_emotions = current.copy()
-
-    plt.close()
 
 if __name__ == '__main__':
     print("Starting Flask app...")

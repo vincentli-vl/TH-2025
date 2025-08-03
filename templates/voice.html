@@ -50,9 +50,8 @@
     </div>
 
     <!-- Conversation Display -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Transcription Display -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
+    <div class="bg-white rounded-lg shadow-sm p-8">
+        <div class="text-center max-w-md mx-auto">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">What You Said</h2>
             <div 
                 id="transcription-display"
@@ -62,70 +61,11 @@
             </div>
         </div>
 
-        <!-- Response Display -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">Assistant Response</h2>
-            <div 
-                id="response-display"
-                class="min-h-[120px] p-4 bg-gray-50 border border-gray-200 rounded-lg text-gray-700"
-            >
-                <!-- Response will appear here -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Conversation History -->
-    <div class="bg-white rounded-lg shadow-sm p-6">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-gray-900">Conversation History</h2>
-            <button 
-                onclick="loadConversationHistory()"
-                class="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-green-600 transition-colors"
-            >
-                📋 Load History
-            </button>
-        </div>
         
-        <div id="history-display" class="hidden">
-            <div class="max-h-64 overflow-y-auto bg-gray-50 border border-gray-200 rounded-lg p-4">
-                <div id="history-content" class="text-sm text-gray-600 space-y-3">
-                    <!-- History will be loaded here -->
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 
 <script>
-    // Additional functionality for conversation history
-    async function loadConversationHistory() {
-        try {
-            const response = await fetch('/get_history');
-            const history = await response.json();
-            
-            const historyDisplay = document.getElementById('history-display');
-            const historyContent = document.getElementById('history-content');
-            
-            if (history.length === 0) {
-                historyContent.innerHTML = '<p class="text-gray-500">No conversation history yet.</p>';
-            } else {
-                let historyHTML = '';
-                history.forEach(entry => {
-                    if (entry.type === 'user') {
-                        historyHTML += `<div class="bg-white p-3 rounded border-l-4 border-primary"><strong>You:</strong> ${entry.user_input}</div>`;
-                    } else {
-                        historyHTML += `<div class="bg-white p-3 rounded border-l-4 border-secondary"><strong>Assistant:</strong> ${entry.response}</div>`;
-                    }
-                });
-                historyContent.innerHTML = historyHTML;
-            }
-            
-            historyDisplay.classList.toggle('hidden');
-        } catch (error) {
-            console.error('Error loading history:', error);
-        }
-    }
-
     // Keyboard shortcuts - toggle recording with spacebar
     document.addEventListener('keydown', (event) => {
         if (event.code === 'Space' && event.target === document.body) {
