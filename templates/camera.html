@@ -1,232 +1,270 @@
 {% extends "base.html" %}
 {% block content %}
 <div id="camera-app" class="p-6 space-y-6">
-		<!-- Header -->
-		<div class="flex justify-between items-center">
-			<div>
-				<h1 class="text-2xl font-medium text-gray-900">Live Camera Monitor</h1>
-				<p class="text-gray-500">Real-time monitoring and surveillance of patient areas.</p>
-			</div>
-			<div class="flex items-center gap-4">
-				<div class="flex items-center gap-2">
-					<div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-					<span class="text-sm text-gray-500">4 Cameras Online</span>
-				</div>
-				<button class="border border-gray-300 text-gray-700 px-3 py-1 rounded-sm text-sm flex items-center gap-2">
-					<!-- Settings icon omitted for brevity -->
-					Camera Settings
-				</button>
-			</div>
-		</div>
-	
-		<div class="grid lg:grid-cols-4 gap-6">
-			<!-- Main Camera View -->
-			<div class="lg:col-span-3 space-y-4">
-				<div class="border rounded-lg overflow-hidden shadow-sm">
-					<div class="p-4 flex justify-between items-center">
-						<div>
-							<h2 id="camera-title" class="flex items-center gap-2 text-lg font-semibold">Living Room Camera</h2>
-							<div class="flex items-center gap-4 mt-1 text-sm text-gray-500">
-								<span id="camera-location">Main Area</span>
-								<span id="camera-status" class="px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs">active</span>
-								<span id="camera-quality">1080p</span>
-							</div>
-						</div>
-						<div class="flex items-center gap-2">
-							<button class="p-1 hover:bg-gray-100 rounded">🔍–</button>
-							<button class="p-1 hover:bg-gray-100 rounded">🔍+</button>
-							<button class="p-1 hover:bg-gray-100 rounded">↔️</button>
-							<button class="p-1 hover:bg-gray-100 rounded">⛶</button>
-						</div>
-					</div>
-					<div class="relative aspect-video bg-gray-900 rounded-b-lg overflow-hidden">
-						<div class="relative aspect-video bg-gray-900 rounded-b-lg overflow-hidden">
-							<img id="main-camera-feed" src="/c0" class="w-full h-full object-cover" alt="Live camera feed" />
-						</div>
-						<div class="absolute top-4 left-4 flex items-center gap-2">
-							<span class="bg-red-600 text-white px-2 py-0.5 text-xs rounded flex items-center gap-1">
-								<span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-								LIVE
-							</span>
-							<span class="bg-black/50 text-white border border-white/20 px-2 py-0.5 text-xs rounded">
-								<span id="current-time">--:--:--</span>
-							</span>
-						</div>
-						<div class="absolute bottom-4 left-4 right-4 flex justify-between items-center">
-							<div class="flex items-center gap-2">
-								<button id="btn-record" class="text-sm px-3 py-1 border rounded flex items-center gap-1">
-									<span id="label-record">Start Recording</span>
-								</button>
-								<button id="btn-capture" class="text-sm px-3 py-1 border rounded flex items-center gap-1">Capture</button>
-							</div>
-							<div class="flex items-center gap-2">
-								<button id="btn-audio" class="p-1 border rounded">🔊</button>
-								<button id="btn-maximize" class="p-1 border rounded">⛶</button>
-							</div>
-						</div>
-					</div>
-					<div class="flex justify-between items-center p-4 border-t">
-						<div class="flex items-center gap-4">
-							<label class="flex items-center gap-2">
-								<span>Camera:</span>
-								<select id="select-camera" class="border rounded p-1"></select>
-							</label>
-							<label class="flex items-center gap-2">
-								<span>View:</span>
-								<select id="select-viewmode" class="border rounded p-1">
-									<option value="single">Single</option>
-									<option value="grid">Grid</option>
-									<option value="pip">Picture‑in‑Picture</option>
-								</select>
-							</label>
-						</div>
-						<div class="flex items-center gap-4">
-							<label class="flex items-center gap-2">
-								<input type="checkbox" id="motion-detection" checked />
-								Motion Detection
-							</label>
-							<label class="flex items-center gap-2">
-								<input type="checkbox" id="night-vision" checked />
-								Night Vision
-							</label>
-						</div>
-					</div>
-				</div>
-	
-				<div id="grid-view" class="hidden">
-					<div class="border rounded-lg shadow-sm p-4">
-						<h3 class="font-semibold mb-2">All Cameras</h3>
-						<div id="grid-container" class="grid grid-cols-2 gap-4"></div>
-					</div>
-				</div>
-			</div>
-	
-			<!-- Sidebar -->
-			<div class="space-y-6">
-				<div class="border rounded-lg shadow-sm p-4">
-					<h3 class="flex items-center gap-2 font-semibold">Camera Status</h3>
-					<div id="status-list" class="mt-2 space-y-2"></div>
-				</div>
-				<div class="border rounded-lg shadow-sm p-4">
-					<h3 class="flex items-center gap-2 font-semibold">Recent Events</h3>
-					<div id="events-list" class="mt-2 space-y-2"></div>
-					<button id="btn-all-events" class="mt-2 w-full p-2 border rounded text-sm">View All Events</button>
-				</div>
-				<div class="border rounded-lg shadow-sm p-4">
-					<h3 class="flex items-center gap-2 font-semibold">Recording Status</h3>
-					<div class="mt-2 space-y-4">
-						<div class="flex justify-between">
-							<span class="text-sm text-gray-500">Local Storage</span>
-							<span class="text-sm font-medium">2.4TB / 4TB</span>
-						</div>
-						<div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-							<div id="record-storage-bar" class="bg-blue-500 h-full" style="width:60%"></div>
-						</div>
-						<div class="flex justify-between">
-							<span class="text-sm text-gray-500">Auto-delete after</span>
-							<span class="text-sm font-medium">30 days</span>
-						</div>
-						<button id="btn-export-recordings" class="w-full p-2 border rounded text-sm flex items-center gap-1">
-							Export Recordings
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	
-	<script>
-	;(function(){
-			// ▼▼▼ 1. ADD 'feedUrl' TO EACH CAMERA ▼▼▼
-			const cameras = [
-					{ id: 'living-room', name: 'Living Room', location: 'Main Area', status: 'active', quality: '1080p', hasAudio: true, feedUrl: '/c0' },
-					{ id: 'bedroom', name: 'Bedroom', location: 'Sleep Area', status: 'active', quality: '720p', hasAudio: false, feedUrl: '/c1' },
-					{ id: 'kitchen', name: 'Kitchen', location: 'Dining Area', status: 'active', quality: '1080p', hasAudio: true, feedUrl: '/c2' },
-					{ id: 'hallway', name: 'Hallway', location: 'Entrance', status: 'maintenance', quality: '720p', hasAudio: false, feedUrl: '/c3' }
-			];
-			// ▲▲▲ END OF CHANGE ▲▲▲
-
-			const events = [
-					{ time: '2:45 PM', camera: 'Living Room', event: 'Motion detected', type: 'motion' },
-					{ time: '1:30 PM', camera: 'Kitchen', event: 'Person recognized: Margaret', type: 'recognition' },
-					{ time: '12:15 PM', camera: 'Living Room', event: 'Visitor detected: Jake', type: 'visitor' }
-			];
-		
-			let selectedCamera = 'living-room'; // Default selected camera
-		
-			const titleEl = document.getElementById('camera-title');
-			const title2El = document.getElementById('camera-title2');
-			const locEl = document.getElementById('camera-location');
-			const statusEl = document.getElementById('camera-status');
-			const qualEl = document.getElementById('camera-quality');
-			const statusList = document.getElementById('status-list');
-			const eventsList = document.getElementById('events-list');
-			const mainFeedEl = document.getElementById('main-camera-feed'); // Get the main feed element
-
-			// ▼▼▼ 2. CREATE A FUNCTION TO SWITCH CAMERAS ▼▼▼
-			function switchCamera(cameraId) {
-					selectedCamera = cameraId;
-					const cam = cameras.find(c => c.id === cameraId);
-					if (cam && mainFeedEl) {
-							mainFeedEl.src = cam.feedUrl; // Change the feed source
-							updateHeader(); // Update the title and info
-					}
-			}
-			// ▲▲▲ END OF CHANGE ▲▲▲
-		
-			function updateHeader(){
-					const cam = cameras.find(c => c.id === selectedCamera);
-					titleEl.textContent = cam.name + ' Camera';
-					title2El.textContent = cam.name; // This ID doesn't exist in your HTML, but keeping the logic
-					locEl.textContent = cam.location;
-					statusEl.textContent = cam.status;
-					statusEl.className = cam.status==='active' ? 'px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs' : 'px-2 py-0.5 bg-red-100 text-red-800 rounded text-xs';
-					qualEl.textContent = cam.quality;
-			}
-		
-			function populateLists(){
-					statusList.innerHTML = '';
-					eventsList.innerHTML = '';
-					cameras.forEach(c => {
-							const div = document.createElement('div');
-							// ▼▼▼ 3. MAKE SIDEBAR ITEMS CLICKABLE ▼▼▼
-							div.className = 'flex items-center justify-between p-2 rounded-lg bg-gray-100 hover:bg-gray-200 cursor-pointer';
-							div.dataset.cameraId = c.id; // Store camera ID on the element
-							// ▲▲▲ END OF CHANGE ▲▲▲
-							div.innerHTML = `<div><p class="text-sm font-medium">${c.name}</p><p class="text-xs text-gray-500">${c.location}</p></div><div class="text-right"><p class="text-xs text-gray-500">${c.quality}</p>${c.hasAudio ? ' 🔊' : ''}</div>`;
-							statusList.appendChild(div);
-					});
-					events.forEach(e => {
-							const div = document.createElement('div');
-							div.className = 'flex items-center gap-3 p-2 rounded-lg bg-gray-100';
-							div.innerHTML = `<div class="w-2 h-2 rounded-full ${ e.type==='motion'?'bg-yellow-500': e.type==='recognition'?'bg-green-500':'bg-blue-500'}"></div><div class="flex-1"><div class="flex items-center gap-2 mb-1"><span class="text-xs font-medium">${e.time}</span><span class="text-xs text-gray-500">•</span><span class="text-xs text-gray-500">${e.camera}</span></div><p class="text-xs text-gray-900">${e.event}</p></div>`;
-							eventsList.appendChild(div);
-					});
-			}
-		
-			// ▼▼▼ 4. ADD CLICK LISTENER TO THE SIDEBAR LIST ▼▼▼
-			statusList.addEventListener('click', e => {
-					const cameraItem = e.target.closest('[data-camera-id]');
-					if (cameraItem) {
-							switchCamera(cameraItem.dataset.cameraId);
-					}
-			});
-			// ▲▲▲ END OF CHANGE ▲▲▲
-
-			const currentTimeEl = document.getElementById('current-time');
-
-			setInterval(() => {
-					// Create a new Date object to get the current time
-					const now = new Date();
-					
-					// Format the time into a local string (e.g., 10:53:01 PM)
-					// and update the content of the time element.
-					currentTimeEl.textContent = now.toLocaleTimeString();
-			}, 1000); // Run this function every 1000 milliseconds (1 second)
-		
-			// Initialize
-			populateLists();
-			updateHeader();
-		})();
-	</script>
+    <!-- Header -->
+    <div class="flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-medium text-gray-900">Live Camera Monitor</h1>
+        <p class="text-gray-500">Real-time monitoring and surveillance of patient areas.</p>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+          <span class="text-sm text-gray-500">4 Cameras Online</span>
+        </div>
+        <button class="border border-gray-300 text-gray-700 px-3 py-1 rounded-sm text-sm flex items-center gap-2">
+          <!-- Settings icon omitted for brevity -->
+          Camera Settings
+        </button>
+      </div>
+    </div>
+  
+    <div class="grid lg:grid-cols-4 gap-6">
+      <!-- Main Camera View -->
+      <div class="lg:col-span-3 space-y-4">
+        <div class="border rounded-lg overflow-hidden shadow-sm">
+          <div class="p-4 flex justify-between items-center">
+            <div>
+              <h2 id="camera-title" class="flex items-center gap-2 text-lg font-semibold">Living Room Camera</h2>
+              <div class="flex items-center gap-4 mt-1 text-sm text-gray-500">
+                <span id="camera-location">Main Area</span>
+                <span id="camera-status" class="px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs">active</span>
+                <span id="camera-quality">1080p</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button class="p-1 hover:bg-gray-100 rounded">🔍–</button>
+              <button class="p-1 hover:bg-gray-100 rounded">🔍+</button>
+              <button class="p-1 hover:bg-gray-100 rounded">↔️</button>
+              <button class="p-1 hover:bg-gray-100 rounded">⛶</button>
+            </div>
+          </div>
+          <div class="relative aspect-video bg-gray-900 rounded-b-lg overflow-hidden">
+            <div class="absolute inset-0 flex items-center justify-center text-white opacity-75 text-center">
+              <div>
+                <p class="text-lg font-medium">Live Camera Feed</p>
+                <p class="text-sm">Streaming from <span id="camera-title2">Living Room</span></p>
+              </div>
+            </div>
+            <div class="absolute top-4 left-4 flex items-center gap-2">
+              <span class="bg-red-600 text-white px-2 py-0.5 text-xs rounded flex items-center gap-1">
+                <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                LIVE
+              </span>
+              <span class="bg-black/50 text-white border border-white/20 px-2 py-0.5 text-xs rounded">
+                <span id="current-time">--:--:--</span>
+              </span>
+            </div>
+            <div class="absolute bottom-4 left-4 right-4 flex justify-between items-center">
+              <div class="flex items-center gap-2">
+                <button id="btn-record" class="text-sm px-3 py-1 border rounded flex items-center gap-1">
+                  <span id="label-record">Start Recording</span>
+                </button>
+                <button id="btn-capture" class="text-sm px-3 py-1 border rounded flex items-center gap-1">Capture</button>
+              </div>
+              <div class="flex items-center gap-2">
+                <button id="btn-audio" class="p-1 border rounded">🔊</button>
+                <button id="btn-maximize" class="p-1 border rounded">⛶</button>
+              </div>
+            </div>
+          </div>
+          <div class="flex justify-between items-center p-4 border-t">
+            <div class="flex items-center gap-4">
+              <label class="flex items-center gap-2">
+                <span>Camera:</span>
+                <select id="select-camera" class="border rounded p-1"></select>
+              </label>
+              <label class="flex items-center gap-2">
+                <span>View:</span>
+                <select id="select-viewmode" class="border rounded p-1">
+                  <option value="single">Single</option>
+                  <option value="grid">Grid</option>
+                  <option value="pip">Picture‑in‑Picture</option>
+                </select>
+              </label>
+            </div>
+            <div class="flex items-center gap-4">
+              <label class="flex items-center gap-2">
+                <input type="checkbox" id="motion-detection" checked />
+                Motion Detection
+              </label>
+              <label class="flex items-center gap-2">
+                <input type="checkbox" id="night-vision" checked />
+                Night Vision
+              </label>
+            </div>
+          </div>
+        </div>
+  
+        <div id="grid-view" class="hidden">
+          <div class="border rounded-lg shadow-sm p-4">
+            <h3 class="font-semibold mb-2">All Cameras</h3>
+            <div id="grid-container" class="grid grid-cols-2 gap-4"></div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Sidebar -->
+      <div class="space-y-6">
+        <div class="border rounded-lg shadow-sm p-4">
+          <h3 class="flex items-center gap-2 font-semibold">Camera Status</h3>
+          <div id="status-list" class="mt-2 space-y-2"></div>
+        </div>
+        <div class="border rounded-lg shadow-sm p-4">
+          <h3 class="flex items-center gap-2 font-semibold">Recent Events</h3>
+          <div id="events-list" class="mt-2 space-y-2"></div>
+          <button id="btn-all-events" class="mt-2 w-full p-2 border rounded text-sm">View All Events</button>
+        </div>
+        <div class="border rounded-lg shadow-sm p-4">
+          <h3 class="flex items-center gap-2 font-semibold">Recording Status</h3>
+          <div class="mt-2 space-y-4">
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-500">Local Storage</span>
+              <span class="text-sm font-medium">2.4TB / 4TB</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+              <div id="record-storage-bar" class="bg-blue-500 h-full" style="width:60%"></div>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-sm text-gray-500">Auto-delete after</span>
+              <span class="text-sm font-medium">30 days</span>
+            </div>
+            <button id="btn-export-recordings" class="w-full p-2 border rounded text-sm flex items-center gap-1">
+              Export Recordings
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+  ;(function(){
+    const cameras = [
+      { id: 'living-room', name: 'Living Room', location: 'Main Area', status: 'active', quality: '1080p', hasAudio: true },
+      { id: 'bedroom', name: 'Bedroom', location: 'Sleep Area', status: 'active', quality: '720p', hasAudio: false },
+      { id: 'kitchen', name: 'Kitchen', location: 'Dining Area', status: 'active', quality: '1080p', hasAudio: true },
+      { id: 'hallway', name: 'Hallway', location: 'Entrance', status: 'maintenance', quality: '720p', hasAudio: false }
+    ];
+    const events = [
+      { time: '2:45 PM', camera: 'Living Room', event: 'Motion detected', type: 'motion' },
+      { time: '1:30 PM', camera: 'Kitchen', event: 'Person recognized: Margaret', type: 'recognition' },
+      { time: '12:15 PM', camera: 'Living Room', event: 'Visitor detected: Jake', type: 'visitor' }
+    ];
+  
+    let isRecording = false;
+    let audioEnabled = true;
+    let selectedCamera = 'living-room';
+    let viewMode = 'single';
+  
+    const titleEl = document.getElementById('camera-title');
+    const title2El = document.getElementById('camera-title2');
+    const locEl = document.getElementById('camera-location');
+    const statusEl = document.getElementById('camera-status');
+    const qualEl = document.getElementById('camera-quality');
+    const btnRecord = document.getElementById('btn-record');
+    const labelRecord = document.getElementById('label-record');
+    const btnAudio = document.getElementById('btn-audio');
+    const selectCamera = document.getElementById('select-camera');
+    const selectView = document.getElementById('select-viewmode');
+    const gridView = document.getElementById('grid-view');
+    const gridContainer = document.getElementById('grid-container');
+    const statusList = document.getElementById('status-list');
+    const eventsList = document.getElementById('events-list');
+    const currentTimeEl = document.getElementById('current-time');
+  
+    function updateHeader(){
+      const cam = cameras.find(c=>c.id===selectedCamera);
+      titleEl.textContent = cam.name + ' Camera';
+      title2El.textContent = cam.name;
+      locEl.textContent = cam.location;
+      statusEl.textContent = cam.status;
+      statusEl.className = cam.status==='active' ? 'px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs' : 'px-2 py-0.5 bg-red-100 text-red-800 rounded text-xs';
+      qualEl.textContent = cam.quality;
+    }
+  
+    function updateRecord(){
+      labelRecord.textContent = isRecording ? 'Stop Recording' : 'Start Recording';
+      btnRecord.classList.toggle('bg-red-600', isRecording);
+    }
+  
+    function updateAudio(){
+      btnAudio.textContent = audioEnabled ? '🔊' : '🔇';
+    }
+  
+    function updateGrid(){
+      gridView.classList.toggle('hidden', viewMode !== 'grid');
+      gridContainer.innerHTML = '';
+      if (viewMode === 'grid'){
+        cameras.forEach(c=>{
+          const div = document.createElement('div');
+          div.className = 'relative';
+          div.innerHTML = `
+            <div class="aspect-video bg-gray-900 rounded-lg flex items-center justify-center text-white opacity-75">
+              <div class="text-center">
+                <p>${c.name}</p>
+              </div>
+            </div>`;
+          gridContainer.appendChild(div);
+        });
+      }
+    }
+  
+    function populateSelects(){
+      cameras.forEach(c=>{
+        const opt = document.createElement('option');
+        opt.value=c.id; opt.text=c.name;
+        selectCamera.appendChild(opt);
+      });
+      selectCamera.value = selectedCamera;
+    }
+  
+    function populateLists(){
+      statusList.innerHTML = '';
+      eventsList.innerHTML = '';
+      cameras.forEach(c=>{
+        const div = document.createElement('div');
+        div.className='flex items-center justify-between p-2 rounded-lg bg-gray-100';
+        div.innerHTML= `<div><p class="text-sm font-medium">${c.name}</p><p class="text-xs text-gray-500">${c.location}</p></div><div class="text-right"><p class="text-xs text-gray-500">${c.quality}</p>${c.hasAudio? ' 🔊':''}</div>`;
+        statusList.appendChild(div);
+      });
+      events.forEach(e=>{
+        const div = document.createElement('div');
+        div.className='flex items-center gap-3 p-2 rounded-lg bg-gray-100';
+        div.innerHTML=`<div class="w-2 h-2 rounded-full ${ e.type==='motion'?'bg-yellow-500': e.type==='recognition'?'bg-green-500':'bg-blue-500'}"></div><div class="flex-1"><div class="flex items-center gap-2 mb-1"><span class="text-xs font-medium">${e.time}</span><span class="text-xs text-gray-500">•</span><span class="text-xs text-gray-500">${e.camera}</span></div><p class="text-xs text-gray-900">${e.event}</p></div>`;
+        eventsList.appendChild(div);
+      });
+    }
+  
+    selectCamera.addEventListener('change', e => {
+      selectedCamera = e.target.value;
+      updateHeader();
+    });
+    selectView.addEventListener('change', e => {
+      viewMode = e.target.value;
+      updateGrid();
+    });
+    btnRecord.addEventListener('click', () => {
+      isRecording = !isRecording;
+      updateRecord();
+    });
+    btnAudio.addEventListener('click', () => {
+      audioEnabled = !audioEnabled;
+      updateAudio();
+    });
+  
+    setInterval(()=>{
+      const now = new Date();
+      currentTimeEl.textContent = now.toLocaleTimeString();
+    },1000);
+  
+    // Initialize
+    populateSelects();
+    populateLists();
+    updateHeader();
+    updateRecord();
+    updateAudio();
+    updateGrid();
+  })();
+  </script>
 {% endblock %}

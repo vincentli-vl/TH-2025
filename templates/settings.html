@@ -1,189 +1,207 @@
 {% extends "base.html" %}
-
 {% block content %}
-<!-- SETTINGS PAGE - Standalone HTML with Tailwind + Vanilla JS -->
-
-<div class="p-6 space-y-6">
+<div class="space-y-6">
     <!-- Header -->
     <div>
-      <h1 class="text-2xl font-medium text-foreground">Settings</h1>
-      <p class="text-muted-foreground">Manage your application preferences and account settings.</p>
+        <h1 class="text-2xl font-semibold text-gray-900">Settings</h1>
+        <p class="text-sm text-gray-600">Manage your application preferences and account settings.</p>
     </div>
-  
+
     <div class="grid lg:grid-cols-3 gap-6">
-      <!-- Main Settings -->
-      <div class="lg:col-span-2 space-y-6">
-  
-        <!-- Appearance -->
-        <div class="border rounded-xl bg-white shadow-sm dark:bg-zinc-900 dark:border-zinc-800">
-          <div class="p-4 border-b dark:border-zinc-800">
-            <div class="flex items-center gap-2 text-lg font-semibold">
-              <!-- Moon Icon -->
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-              Appearance
+        <!-- Left Column - Main Settings -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Appearance Section -->
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <div class="mb-4">
+                    <h2 class="text-lg font-semibold text-gray-900">Appearance</h2>
+                    <p class="text-sm text-gray-600">Customize how the application looks and feels.</p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-900">Dark Mode</h3>
+                            <p class="text-xs text-gray-600">Enable dark mode for a better night-time experience.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:bg-primary"></div>
+                            <div class="absolute left-1 top-1 bg-white border border-gray-300 rounded-full h-4 w-4 transition-transform peer-checked:translate-x-5"></div>
+                        </label>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Theme</label>
+                        <select class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            <option value="system" selected>System</option>
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Language</label>
+                        <select class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                            <option value="english" selected>English</option>
+                            <option value="spanish">Español</option>
+                            <option value="french">Français</option>
+                            <option value="german">Deutsch</option>
+                        </select>
+                    </div>
+                </div>
             </div>
-            <p class="text-sm text-muted-foreground">Customize how the application looks and feels.</p>
-          </div>
-          <div class="p-4 space-y-4">
-            <div class="flex items-center justify-between">
-              <div class="space-y-0.5">
-                <label class="font-medium">Dark Mode</label>
-                <p class="text-sm text-muted-foreground">Enable dark mode for a better night-time experience.</p>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" class="sr-only peer" id="darkModeToggle">
-                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer dark:bg-gray-700 peer-checked:bg-blue-600"></div>
-                <span class="sr-only">Dark Mode</span>
-              </label>
+
+            <!-- Notifications Section -->
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <div class="mb-4">
+                    <h2 class="text-lg font-semibold text-gray-900">Notifications</h2>
+                    <p class="text-sm text-gray-600">Configure how and when you receive notifications.</p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-900">Daily Reminders</h3>
+                            <p class="text-xs text-gray-600">Get reminded to write in your journal each day.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" checked class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:bg-primary"></div>
+                            <div class="absolute left-1 top-1 bg-white border border-gray-300 rounded-full h-4 w-4 transition-transform peer-checked:translate-x-5"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-900">Goal Deadlines</h3>
+                            <p class="text-xs text-gray-600">Receive notifications when goals are due.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" checked class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:bg-primary"></div>
+                            <div class="absolute left-1 top-1 bg-white border border-gray-300 rounded-full h-4 w-4 transition-transform peer-checked:translate-x-5"></div>
+                        </label>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-900">Achievement Notifications</h3>
+                            <p class="text-xs text-gray-600">Get notified when you unlock new achievements.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" checked class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:bg-primary"></div>
+                            <div class="absolute left-1 top-1 bg-white border border-gray-300 rounded-full h-4 w-4 transition-transform peer-checked:translate-x-5"></div>
+                        </label>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Notification Time</label>
+                        <input type="text" value="Morning (9:00 AM)" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" readonly>
+                    </div>
+                </div>
             </div>
-            <hr class="border-muted" />
-  
-            <div>
-              <label class="block mb-1 text-sm font-medium">Theme</label>
-              <select class="w-full px-3 py-2 border rounded-md dark:bg-zinc-800">
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
-                <option selected value="system">System</option>
-              </select>
+
+            <!-- Privacy & Security Section -->
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <div class="mb-4">
+                    <h2 class="text-lg font-semibold text-gray-900">Privacy & Security</h2>
+                    <p class="text-sm text-gray-600">Manage your privacy settings and account security.</p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-900">Two-Factor Authentication</h3>
+                            <p class="text-xs text-gray-600">Add an extra layer of security to your account.</p>
+                        </div>
+                        <button class="px-3 py-1 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                            Enable
+                        </button>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-900">Data Encryption</h3>
+                            <p class="text-xs text-gray-600">All your data is encrypted end-to-end.</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" disabled class="sr-only peer">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:bg-primary opacity-50"></div>
+                            <div class="absolute left-1 top-1 bg-white border border-gray-300 rounded-full h-4 w-4 transition-transform peer-checked:translate-x-5"></div>
+                        </label>
+                    </div>
+
+                    <button class="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        Change Password
+                    </button>
+                </div>
             </div>
-  
-            <div>
-              <label class="block mb-1 text-sm font-medium">Language</label>
-              <select class="w-full px-3 py-2 border rounded-md dark:bg-zinc-800">
-                <option value="en">English</option>
-                <option value="es">Español</option>
-                <option value="fr">Français</option>
-                <option value="de">Deutsch</option>
-              </select>
-            </div>
-          </div>
         </div>
-  
-        <!-- Notifications -->
-        <div class="border rounded-xl bg-white shadow-sm dark:bg-zinc-900 dark:border-zinc-800">
-          <div class="p-4 border-b dark:border-zinc-800">
-            <div class="flex items-center gap-2 text-lg font-semibold">
-              <!-- Bell Icon -->
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-              Notifications
+
+        <!-- Right Column -->
+        <div class="space-y-6">
+            <!-- Data Management -->
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Data Management</h3>
+                
+                <div class="space-y-3">
+                    <button class="w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Export Data
+                    </button>
+
+                    <button class="w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        Import Data
+                    </button>
+
+                    <button class="w-full flex items-center justify-center gap-2 px-4 py-2 border border-red-500 text-red-600 rounded-lg hover:bg-red-50 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        Delete Account
+                    </button>
+                </div>
             </div>
-            <p class="text-sm text-muted-foreground">Configure how and when you receive notifications.</p>
-          </div>
-          <div class="p-4 space-y-4">
-            <div class="flex items-center justify-between">
-              <div class="space-y-0.5">
-                <label class="font-medium">Daily Reminders</label>
-                <p class="text-sm text-muted-foreground">Get reminded to write in your journal each day.</p>
-              </div>
-              <input type="checkbox" checked class="toggle-switch">
+
+            <!-- Help & Support -->
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Help & Support</h3>
+                
+                <div class="space-y-3">
+                    <button class="w-full text-sm border border-gray-300 px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        Help Center
+                    </button>
+                    <button class="w-full text-sm border border-gray-300 px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        Contact Support
+                    </button>
+                    <button class="w-full text-sm border border-gray-300 px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                        Report a Bug
+                    </button>
+                </div>
             </div>
-            <div class="flex items-center justify-between">
-              <div class="space-y-0.5">
-                <label class="font-medium">Goal Deadlines</label>
-                <p class="text-sm text-muted-foreground">Receive notifications when goals are due.</p>
-              </div>
-              <input type="checkbox" checked class="toggle-switch">
+
+            <!-- App Information -->
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">App Information</h3>
+                
+                <div class="space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-600">Version</span>
+                        <span class="text-sm text-gray-900">1.0.0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-sm text-gray-600">Last Updated</span>
+                        <span class="text-sm text-gray-900">Aug 2, 2025</span>
+                    </div>
+                </div>
             </div>
-            <div class="flex items-center justify-between">
-              <div class="space-y-0.5">
-                <label class="font-medium">Achievement Notifications</label>
-                <p class="text-sm text-muted-foreground">Get notified when you unlock new achievements.</p>
-              </div>
-              <input type="checkbox" checked class="toggle-switch">
-            </div>
-            <hr class="border-muted">
-            <div>
-              <label class="block mb-1 text-sm font-medium">Notification Time</label>
-              <select class="w-full px-3 py-2 border rounded-md dark:bg-zinc-800">
-                <option selected value="morning">Morning (9:00 AM)</option>
-                <option value="afternoon">Afternoon (2:00 PM)</option>
-                <option value="evening">Evening (8:00 PM)</option>
-              </select>
-            </div>
-          </div>
         </div>
-  
-        <!-- Privacy & Security -->
-        <div class="border rounded-xl bg-white shadow-sm dark:bg-zinc-900 dark:border-zinc-800">
-          <div class="p-4 border-b dark:border-zinc-800">
-            <div class="flex items-center gap-2 text-lg font-semibold">
-              <!-- Shield Icon -->
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              Privacy & Security
-            </div>
-            <p class="text-sm text-muted-foreground">Manage your privacy settings and account security.</p>
-          </div>
-          <div class="p-4 space-y-4">
-            <div class="flex items-center justify-between">
-              <div class="space-y-0.5">
-                <label class="font-medium">Two-Factor Authentication</label>
-                <p class="text-sm text-muted-foreground">Add an extra layer of security to your account.</p>
-              </div>
-              <button class="px-3 py-1 text-sm border rounded-md">Enable</button>
-            </div>
-            <div class="flex items-center justify-between">
-              <div class="space-y-0.5">
-                <label class="font-medium">Data Encryption</label>
-                <p class="text-sm text-muted-foreground">All your data is encrypted end-to-end.</p>
-              </div>
-              <input type="checkbox" checked disabled class="toggle-switch">
-            </div>
-            <hr class="border-muted">
-            <button class="w-full px-4 py-2 text-sm border rounded-md">Change Password</button>
-          </div>
-        </div>
-      </div>
-  
-      <!-- Sidebar -->
-      <div class="space-y-6">
-        <!-- Data Management -->
-        <div class="border rounded-xl bg-white shadow-sm dark:bg-zinc-900 dark:border-zinc-800">
-          <div class="p-4 border-b dark:border-zinc-800 font-semibold">Data Management</div>
-          <div class="p-4 space-y-3">
-            <button class="w-full flex items-center gap-2 border px-4 py-2 rounded-md text-sm">
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-              Export Data
-            </button>
-            <button class="w-full flex items-center gap-2 border px-4 py-2 rounded-md text-sm">
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-              Import Data
-            </button>
-            <hr class="border-muted">
-            <button class="w-full flex items-center gap-2 border border-red-500 text-red-500 px-4 py-2 rounded-md text-sm">
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-              Delete Account
-            </button>
-          </div>
-        </div>
-  
-        <!-- Help & Support -->
-        <div class="border rounded-xl bg-white shadow-sm dark:bg-zinc-900 dark:border-zinc-800">
-          <div class="p-4 border-b dark:border-zinc-800 flex items-center gap-2 font-semibold">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.82 1c0 2-3 3-3 3"/><line x1="12" x2="12" y1="17" y2="17"/></svg>
-            Help & Support
-          </div>
-          <div class="p-4 space-y-3">
-            <button class="w-full text-sm border px-4 py-2 rounded-md">Help Center</button>
-            <button class="w-full text-sm border px-4 py-2 rounded-md">Contact Support</button>
-            <button class="w-full text-sm border px-4 py-2 rounded-md">Report a Bug</button>
-          </div>
-        </div>
-  
-        <!-- App Info -->
-        <div class="border rounded-xl bg-white shadow-sm dark:bg-zinc-900 dark:border-zinc-800">
-          <div class="p-4 border-b dark:border-zinc-800 font-semibold">App Information</div>
-          <div class="p-4 text-sm space-y-2">
-            <div class="flex justify-between text-muted-foreground">
-              <span>Version</span>
-              <span>1.0.0</span>
-            </div>
-            <div class="flex justify-between text-muted-foreground">
-              <span>Last Updated</span>
-              <span>Aug 2, 2025</span>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
+</div>
 {% endblock %}
