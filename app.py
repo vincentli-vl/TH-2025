@@ -9,6 +9,8 @@ import cv2
 from deepface import DeepFace
 import numpy as np
 import time
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
 CAM0 = 0
 CAM1 = 1
@@ -52,6 +54,7 @@ emoji_dir = "emojis"
 emoji_map = {}
 emoji_size = (80, 80)
 CYAN = (255, 255, 0)
+stop_plot_thread = False
 
 for emo in latest_emotions.keys():
     path = os.path.join(emoji_dir, f"{emo}.png")
@@ -84,14 +87,13 @@ def recognize_identity(face_embedding):
 def scan(cam):
     frame_count = 0
     analysis_results = []
-    scale_factor = 0.5  # Must match fx, fy in resize
+    scale_factor = 0.5
     while True:
         r, f = cam.read()
         if not r:
             continue
 
         frame_count += 1
-        # Only analyze every 10th frame for performance
         if frame_count % 10 == 0:
             try:
                 small_f = cv2.resize(f, (0, 0), fx=scale_factor, fy=scale_factor)
@@ -101,7 +103,6 @@ def scan(cam):
                     enforce_detection=False,
                     detector_backend="opencv"
                 )
-                # DeepFace returns a dict for one face, or a list for multiple
                 if isinstance(analysis, dict):
                     analysis_results = [analysis]
                 elif isinstance(analysis, list):
@@ -109,10 +110,8 @@ def scan(cam):
             except Exception as e:
                 print(f"Face scan error: {e}")
 
-        # Draw results for all detected faces
         for face in analysis_results:
             region = face.get('region', {})
-            # Scale coordinates back to original frame size
             x = int(region.get('x', 0) / scale_factor)
             y = int(region.get('y', 0) / scale_factor)
             w = int(region.get('w', 0) / scale_factor)
@@ -136,9 +135,9 @@ def scan(cam):
 
         frame_bytes = buffer.tobytes()
         yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n') 
+               b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
 
-# Routes
+# Flask routes
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -238,6 +237,63 @@ def save_conversation_to_file():
     except Exception as e:
         print(f"Error saving conversation: {e}")
 
+def emotion_plotter():
+    plt.ion()
+    previous_emotions = None
+
+    fig = plt.figure(figsize=(10, 6))
+    pie_ax = fig.add_axes([0.05, 0.1, 0.5, 0.8])
+    legend_ax = fig.add_axes([0.62, 0.05, 0.35, 0.9])
+    legend_ax.axis('off')
+
+    while not stop_plot_thread:
+        current = latest_emotions.copy()
+        if current == previous_emotions:
+            time.sleep(0.1)
+            continue
+
+        pie_ax.clear()
+        values = list(current.values())
+        labels = list(current.keys())
+        total = sum(values)
+        if total == 0:
+            time.sleep(0.1)
+            continue
+
+        percentages = [v / total * 100 for v in values]
+        custom_colors = {
+            'angry': '#D7263D',
+            'disgust': '#8B5E3C',
+            'fear': '#5D50A0',
+            'happy': '#FFD700',
+            'sad': '#2E86AB',
+            'surprise': '#FF6B35',
+            'neutral': "#219B7C"
+        }
+        colors = [custom_colors.get(label, '#CCCCCC') for label in labels]
+
+        wedges, _ = pie_ax.pie(percentages, colors=colors, startangle=140)
+        pie_ax.set_title("Real-Time Emotion Pie Chart", fontsize=14)
+
+        legend_ax.clear()
+        legend_ax.axis('off')
+        spacing = 0.09
+        total_items = len(labels)
+        start_y = 0.5 + (spacing * (total_items - 1)) / 2
+
+        for i, (label, pct, color) in enumerate(zip(labels, percentages, colors)):
+            y = start_y - i * spacing
+            legend_ax.add_patch(mpatches.Rectangle((0.0, y - 0.03), 0.08, 0.06, color=color, transform=legend_ax.transAxes))
+            legend_ax.text(0.12, y, f"{label.capitalize():<10} {pct:5.1f}%", fontsize=12, va='center', transform=legend_ax.transAxes)
+
+        plt.draw()
+        plt.pause(0.1)
+        previous_emotions = current.copy()
+
+    plt.close()
+
 if __name__ == '__main__':
     print("Starting Flask app...")
+    plot_thread = threading.Thread(target=emotion_plotter, daemon=True)
+    plot_thread.start()
     app.run(debug=False)
