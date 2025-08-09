@@ -25,6 +25,19 @@ This program was made for the 2025 TerraHacks competition. It is based on flask,
 - **Emergency Contact**: One-click emergency contact button
 - **Responsive Design**: Works on desktop and mobile devices
 
+## demo images
+<div>
+   <img src="https://github.com/vincentli-vl/TH-2025/blob/main/demo_images/landing%20page.jpg" alt="landing page" width="250" height="500"/>
+   <img src="https://github.com/vincentli-vl/TH-2025/blob/main/demo_images/dashboard.jpg" alt="dashboard page" width="250" height="500"/>
+   <img src="https://github.com/vincentli-vl/TH-2025/blob/main/demo_images/echocare.jpg" alt="echocare page" width="250" height="500"/>
+   <img src="https://github.com/vincentli-vl/TH-2025/blob/main/demo_images/camera.jpg" alt="camera page" width="250" height="500"/>
+   <img src="https://github.com/vincentli-vl/TH-2025/blob/main/demo_images/logger.jpg" alt="logger page" width="250" height="500"/>
+   <img src="https://github.com/vincentli-vl/TH-2025/blob/main/demo_images/logger%202.jpg" alt="logger page" width="250" height="500"/>
+   <img src="https://github.com/vincentli-vl/TH-2025/blob/main/demo_images/logger%203.jpg" alt="logger page" width="250" height="500"/>
+   <img src="https://github.com/vincentli-vl/TH-2025/blob/main/demo_images/profile.jpg" alt="profile page" width="250" height="500"/>
+   <img src="https://github.com/vincentli-vl/TH-2025/blob/main/demo_images/settings.jpg" alt="settings page" width="250" height="500"/>
+</div>
+
 ## 🚀 Quick Start
 
 ### Prerequisites
