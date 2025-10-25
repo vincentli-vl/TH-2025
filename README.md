@@ -25,7 +25,7 @@ This program was made for the 2025 TerraHacks competition. It is based on flask,
 - **Emergency Contact**: One-click emergency contact button
 - **Responsive Design**: Works on desktop and mobile devices
 
-## demo images
+## Demo Images
 <div>
    <img src="https://github.com/vincentli-vl/TH-2025/blob/main/demo_images/landing%20page.jpg" alt="landing page" width="250" height="500"/>
    <img src="https://github.com/vincentli-vl/TH-2025/blob/main/demo_images/dashboard.jpg" alt="dashboard page" width="250" height="500"/>
